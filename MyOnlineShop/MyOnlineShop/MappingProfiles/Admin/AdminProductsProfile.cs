@@ -9,7 +9,11 @@ namespace MyOnlineShop.MappingProfiles.Admin
         public ProductsProfile()
         {
             this.CreateMap<Product, ProductIndexViewModel>();
+            
             this.CreateMap<Image, ProductImageViewModel>();
+
+            this.CreateMap<CreateProductViewModel, Product>()
+                .ForMember(dest => dest.ProductCategories, opts => opts.Ignore());
         }
     }
 }

@@ -1,20 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Areas.Admin.Constants;
 using MyOnlineShop.Areas.Admin.ViewModels.Products;
 using MyOnlineShop.Data;
+using MyOnlineShop.Models.Products;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.Areas.Admin.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext dbContext;
+        private readonly IMapper mapper;
 
-        public ProductsController(ApplicationDbContext dbContext)
+        public ProductsController(ApplicationDbContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
+            this.mapper = mapper;
         }
 
         public async Task<IActionResult> Index()
@@ -47,28 +55,91 @@ namespace MyOnlineShop.Areas.Admin.Controllers
             return View(productIndexViewModels);
         }
 
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            return View();
+            var productDetailsViewModel = await this.dbContext
+                .Products
+                .Where(x => x.Id == id)
+                .Select(x => new ProductDetailsViewModel
+                {
+                    Description = x.Description,
+                    Name = x.Name,
+                    Price = x.Price,
+                    StockAvailable = x.StockAvailable,
+                    Weight = x.Weight,
+                    ImageViewModels = x
+                        .Images
+                        .Select(i => new ProductImageViewModel
+                        {
+                            Id = i.Id,
+                            Name = i.Name
+                        })
+                        .ToList()
+                })
+                .ToListAsync();
+
+            return View(productDetailsViewModel);
         }
 
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var createProductViewModel = new CreateProductViewModel 
+            {
+                Categories = await this.dbContext
+                    .Categories
+                    .Select(x => new SelectListItem
+                    {
+                        Text = x.Name,
+                        Value = x.Id.ToString()
+                    })
+                    .ToListAsync()
+            };
+
+            return View(createProductViewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(CreateProductViewModel createProductViewModel)
+        public async Task<IActionResult> Create(CreateProductViewModel createProductViewModel)
         {
-            try
+            if (this.ModelState.IsValid)
             {
+                var productNameExists = await this.dbContext
+                    .Products
+                    .AnyAsync(x => x.Name.ToLower() == createProductViewModel.Name.ToLower());
+
+                if (productNameExists)
+                {
+                    throw new Exception(string.Format(ProductConstants.ProductAlreadyExists, createProductViewModel.Name));
+                }
+
+                var categoryExists = await this.dbContext
+                    .Categories
+                    .AnyAsync(x => x.Id == createProductViewModel.CategoryId);
+
+                if (!categoryExists)
+                {
+                    throw new Exception(CategoryConstants.DoesNotExistMessage);
+                }
+
+                var product = this.mapper.Map<CreateProductViewModel, Product>(createProductViewModel);
+                var productCategory = new ProductCategory
+                {
+                    CategoryId = createProductViewModel.CategoryId
+                };
+                product
+                    .ProductCategories
+                    .Add(productCategory);
+
+                await this.dbContext
+                    .Products
+                    .AddAsync(product);
+
                 return RedirectToAction(nameof(Index));
+
             }
-            catch
-            {
-                return View();
-            }
+
+            return View(createProductViewModel);
         }
 
         public ActionResult Edit(int id)
