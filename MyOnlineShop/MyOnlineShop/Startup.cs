@@ -12,6 +12,7 @@ using MyOnlineShop.AutoMapperProfiles;
 using MyOnlineShop.Data;
 using MyOnlineShop.Emails;
 using MyOnlineShop.Models.Customers;
+using MyOnlineShop.SeedData;
 using Newtonsoft.Json;
 using System;
 
@@ -84,8 +85,11 @@ namespace MyOnlineShop
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<Customer> userManager, RoleManager<IdentityRole> roleManager)
         {
+            var identityDataInitializer = new IdentityDataInitializer(userManager, roleManager);
+            identityDataInitializer.SeedData();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
