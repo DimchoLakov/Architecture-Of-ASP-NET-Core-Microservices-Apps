@@ -22,7 +22,7 @@ namespace MyOnlineShop.SeedData
 
         private void SeedUsers()
         {
-            if (this.userManager.FindByNameAsync("developer@doverfs.com").Result == null)
+            if (this.userManager.FindByNameAsync("dev@developer.com").Result == null)
             {
                 var user = new Customer
                 {
