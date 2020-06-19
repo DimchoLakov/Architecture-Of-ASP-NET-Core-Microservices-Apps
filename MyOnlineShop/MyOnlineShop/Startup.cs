@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MyOnlineShop.AutoMapperProfiles;
 using MyOnlineShop.Data;
 using MyOnlineShop.Data.Models.Customers;
 using MyOnlineShop.Emails;
+using MyOnlineShop.MappingProfiles.Admin;
 using MyOnlineShop.SeedData;
 using Newtonsoft.Json;
 using System;
@@ -82,7 +82,9 @@ namespace MyOnlineShop
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 });
 
-            services.AddAutoMapper(typeof(MyOnlineShopProfile));
+            services.AddAutoMapper(
+                typeof(AdminProductsProfile),
+                typeof(AdminCategoriesProfile));
 
             // Services
             services.AddTransient<IEmailSender, EmailSender>();
@@ -119,11 +121,11 @@ namespace MyOnlineShop
             {
                 endpoints.MapControllerRoute(
                     name: "areas",
-                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{area:exists}/{controller=Products}/{action=Index}/{id?}");
 
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Products}/{action=Index}/{id?}");
 
                 endpoints.MapRazorPages();
             });

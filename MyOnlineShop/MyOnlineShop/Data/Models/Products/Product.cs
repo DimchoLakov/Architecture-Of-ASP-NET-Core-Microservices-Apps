@@ -1,4 +1,5 @@
 ﻿using MyOnlineShop.Data.Models.Galleries;
+using System;
 using System.Collections.Generic;
 
 namespace MyOnlineShop.Data.Models.Products
@@ -24,6 +25,10 @@ namespace MyOnlineShop.Data.Models.Products
         public string Description { get; set; }
 
         public bool IsArchived { get; set; }
+
+        public DateTime DateAdded { get; set; }
+
+        public DateTime LastUpdated { get; set; }
 
         public ICollection<Image> Images { get; set; }
 

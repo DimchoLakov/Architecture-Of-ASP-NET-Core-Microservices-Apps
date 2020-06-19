@@ -18,15 +18,10 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <partial name="_LoginPartial" />
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        @if (this.User.IsInRole("Administrator"))
-                        {
+                    @if (this.User.IsInRole("Administrator"))
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+
                             <li class="nav-item dropdown">
                                 <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="AdminAreaNavbarDropdown" class="nav-link dropdown-toggle text-dark">
                                     Admin Area
@@ -38,8 +33,16 @@
                                     <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="dropdown-item">Manage Orders</a>
                                 </div>
                             </li>
-                        }
-                    </ul>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="#">Shopping Cart</a>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </div>
         </nav>

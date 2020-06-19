@@ -3,22 +3,16 @@
 @{
     ViewData["Title"] = "Manage Products";
 }
-    <style>
-        img{
-            max-height: 50%;
-        }
-    </style>
 
 <div class="row mt-3 mb-3">
-    <div class="col-md-5">
+    <div class="col-md-7">
         <form method="get" asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-search="@Model.PaginationViewModel.Search">
             <div class="form-row align-items-center">
-                <div class="col-auto d-md-flex flex-grow-1">
-                    <label asp-for="Search" class="align-self-md-center mr-2"></label>
-                    <input asp-for="Search" placeholder="Laptop" class="form-control mb-2" />
+                <div class="col-auto flex-grow-1 pr-0">
+                    <input asp-for="Search" placeholder="What are you looking for?" class="form-control mb-2" />
                 </div>
-                <div class="col-auto align-self-md-end">
-                    <button type="submit" class="btn btn-primary mb-2">Submit</button>
+                <div class="col-auto align-self-md-end pl-0">
+                    <button type="submit" class="btn btn-primary mb-2">Search</button>
                 </div>
             </div>
         </form>
@@ -37,16 +31,18 @@
                 @for (int k = 0; k <= 3 && k + i < Model.ProductIndexViewModels.Count(); k++)
                 {
                     <div class="card p-0">
-                        <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@Model.ProductIndexViewModels[k + i].Id">
-                            <img class="card-img-top" src="@Url.Content($"~/Admin/Images/Get/?id={Model.ProductIndexViewModels[k + i].ImageViewModel.Id}")" alt="@Model.ProductIndexViewModels[k + i].ImageViewModel.Name">
+                        <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@Model.ProductIndexViewModels[k + i].Id" asp-route-fromPage="@Model.PaginationViewModel.CurrentPage">
+                            <div class="card-img-wrapper">
+                                <img class="card-img-top" src="@Url.Content($"~/Admin/Images/Get/?id={Model.ProductIndexViewModels[k + i].ImageViewModel.Id}")" alt="@Model.ProductIndexViewModels[k + i].ImageViewModel.Name">
+                            </div>
                         </a>
                         <div class="card-body">
-                            <h5 class="card-title">Name: @Model.ProductIndexViewModels[k + i].Name</h5>
+                            <h5 class="card-title">@Model.ProductIndexViewModels[k + i].Name</h5>
                             <p class="card-text">Description: @Model.ProductIndexViewModels[k + i].Description</p>
-                            <p class="card-text">Price: @Model.ProductIndexViewModels[k + i].Price</p>
+                            <p class="card-text">Price: $@Model.ProductIndexViewModels[k + i].Price</p>
                         </div>
-                        <div class="card-footer">
-                            <a asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-id="@Model.ProductIndexViewModels[k + i].Id">Details</a>
+                        <div class="card-footer text-center">
+                            <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@Model.ProductIndexViewModels[k + i].Id" asp-route-fromPage="@Model.PaginationViewModel.CurrentPage">Details</a>
                         </div>
                     </div>
                 }

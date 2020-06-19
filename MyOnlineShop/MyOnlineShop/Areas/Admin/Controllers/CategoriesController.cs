@@ -6,7 +6,6 @@ using MyOnlineShop.Areas.Admin.ViewModels.Categories;
 using MyOnlineShop.Areas.Admin.ViewModels.Products;
 using MyOnlineShop.Data;
 using MyOnlineShop.Data.Models.Categories;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 

@@ -103,7 +103,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
             return this.View(productPaginationViewModel);
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, int? fromPage = 1)
         {
             var productExists = await this.dbContext
                 .Products
@@ -119,11 +119,29 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                 .Where(x => x.Id == id)
                 .Select(x => new ProductDetailsViewModel
                 {
+                    Id = x.Id,
                     Description = x.Description,
                     Name = x.Name,
                     Price = x.Price,
                     StockAvailable = x.StockAvailable,
                     Weight = x.Weight,
+                    DateAdded = x.DateAdded,
+                    LastUpdated = x.LastUpdated,
+                    IsArchived = x.IsArchived,
+                    FromPageNumber = fromPage.Value,
+                    PrimaryImageViewModel = new ProductImageViewModel
+                    {
+                        Id = x
+                              .Images
+                              .Where(i => i.IsPrimary)
+                              .Select(i => i.Id)
+                              .FirstOrDefault(),
+                        Name = x
+                              .Images
+                              .Where(i => i.IsPrimary)
+                              .Select(i => i.Name)
+                              .FirstOrDefault()
+                    },
                     ImageViewModels = x
                         .Images
                         .Select(i => new ProductImageViewModel
@@ -133,7 +151,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                         })
                         .ToList()
                 })
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
             return this.View(productDetailsViewModel);
         }
@@ -236,7 +254,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
             return this.View(createProductViewModel);
         }
 
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, int? fromPage = 1)
         {
             var productExists = await this.dbContext
                .Products
@@ -247,7 +265,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                 return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
             }
 
-            var editProductViewModel = this.dbContext
+            var editProductViewModel = await this.dbContext
                 .Products
                 .Where(x => x.Id == id)
                 .Select(x => new EditProductViewModel
@@ -256,18 +274,35 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                     Description = x.Description,
                     Name = x.Name,
                     Price = x.Price,
-                    Weight = x.Weight,
                     StockAvailable = x.StockAvailable,
+                    Weight = x.Weight,
+                    DateAdded = x.DateAdded,
+                    LastUpdated = x.LastUpdated,
+                    IsArchived = x.IsArchived,
+                    FromPageNumber = fromPage.Value,
+                    PrimaryImageViewModel = new ProductImageViewModel
+                    {
+                        Id = x
+                              .Images
+                              .Where(i => i.IsPrimary)
+                              .Select(i => i.Id)
+                              .FirstOrDefault(),
+                        Name = x
+                              .Images
+                              .Where(i => i.IsPrimary)
+                              .Select(i => i.Name)
+                              .FirstOrDefault()
+                    },
                     ImageViewModels = x
-                            .Images
-                            .Select(i => new ProductImageViewModel
-                            {
-                                Id = i.Id,
-                                Name = i.Name
-                            })
-                            .ToList()
+                        .Images
+                        .Select(i => new ProductImageViewModel
+                        {
+                            Id = i.Id,
+                            Name = i.Name
+                        })
+                        .ToList()
                 })
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
             return this.View(editProductViewModel);
         }
@@ -300,7 +335,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                 await this.dbContext
                 .SaveChangesAsync();
 
-                return this.RedirectToAction(nameof(Index));
+                return this.RedirectToAction(nameof(Index), new { currentPage = editProductViewModel.FromPageNumber });
             }
 
 

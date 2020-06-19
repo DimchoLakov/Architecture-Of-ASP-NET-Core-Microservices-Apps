@@ -1,4 +1,56 @@
 ﻿@model EditProductViewModel
 
 @{
+    ViewData["Title"] = "Edit Product";
 }
+
+    <form method="post" asp-area="Admin" asp-controller="Products" asp-action="Edit">
+        <input asp-for="FromPageNumber" type="hidden" />
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <img src="@Url.Content($"~/Admin/Images/Get/?id={Model.PrimaryImageViewModel.Id}")" alt="@Model.PrimaryImageViewModel.Name" class="card-img">
+            </div>
+            <div class="col-md-5">
+                <h5>
+                    <label asp-for="Name"></label>
+                    <input asp-for="Name" />
+                </h5>
+                <p>
+                    <label asp-for="Price"></label>
+                    <input asp-for="Price" />
+                </p>
+                <p>
+                    <label asp-for="StockAvailable"></label>
+                    <input asp-for="StockAvailable" />
+                </p>
+                <p>
+                    <label asp-for="Weight"></label>
+                    <input asp-for="Weight" />
+                </p>
+                <p class="d-md-flex">
+                    <label asp-for="Description" class="mr-1"></label>
+                    <textarea asp-for="Description" rows="5" cols="50"></textarea>
+                </p>
+                <p>Date Added: @Model.DateAdded.ToString("dd/MMMM/yyyy HH:mm")</p>
+                <p>Date Last Updated: @Model.LastUpdated.ToString("dd/MMMM/yyyy HH:mm")</p>
+                <p class="d-md-inline-block p-2 text-white bg-@(Model.IsArchived ? "success" : "danger")">@(Model.IsArchived ? "Unarchive" : "Archive")</p>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-12">
+                <div class="d-md-flex flex-md-row flex-md-wrap">
+                    @foreach (var imageViewModel in Model.ImageViewModels)
+                    {
+                        <div class="product-image">
+                            <img src="@Url.Content($"~/Admin/Images/Get/?id={imageViewModel.Id}")" alt="@imageViewModel.Name" class="img-fluid" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-currentPage="@Model.FromPageNumber" class="btn btn-secondary w-25">Cancel</a>
+            <button type="submit" class="btn btn-primary w-25">Save Changes</button>
+        </div>
+    </form>
