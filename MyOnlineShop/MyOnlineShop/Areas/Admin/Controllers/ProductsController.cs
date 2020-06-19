@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Areas.Admin.Constants;
+using MyOnlineShop.Areas.Admin.ViewModels.Common;
 using MyOnlineShop.Areas.Admin.ViewModels.Products;
 using MyOnlineShop.Data;
 using MyOnlineShop.Models.Products;
@@ -29,6 +30,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
         {
             var productIndexViewModels = await this.dbContext
                 .Products
+                .Where(x => !x.IsArchived)
                 .Take(ProductConstants.MaxTakeCount)
                 .Select(x => new ProductIndexViewModel()
                 {
@@ -52,11 +54,20 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                 })
                 .ToListAsync();
 
-            return View(productIndexViewModels);
+            return this.View(productIndexViewModels);
         }
 
         public async Task<IActionResult> Details(int id)
         {
+            var productExists = await this.dbContext
+                .Products
+                .AnyAsync(x => x.Id == id);
+
+            if (!productExists)
+            {
+                return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
+            }
+
             var productDetailsViewModel = await this.dbContext
                 .Products
                 .Where(x => x.Id == id)
@@ -78,12 +89,12 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                 })
                 .ToListAsync();
 
-            return View(productDetailsViewModel);
+            return this.View(productDetailsViewModel);
         }
 
         public async Task<IActionResult> Create()
         {
-            var createProductViewModel = new CreateProductViewModel 
+            var createProductViewModel = new CreateProductViewModel
             {
                 Categories = await this.dbContext
                     .Categories
@@ -95,11 +106,10 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                     .ToListAsync()
             };
 
-            return View(createProductViewModel);
+            return this.View(createProductViewModel);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateProductViewModel createProductViewModel)
         {
             if (this.ModelState.IsValid)
@@ -113,23 +123,25 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                     throw new Exception(string.Format(ProductConstants.ProductAlreadyExists, createProductViewModel.Name));
                 }
 
-                var categoryExists = await this.dbContext
-                    .Categories
-                    .AnyAsync(x => x.Id == createProductViewModel.CategoryId);
-
-                if (!categoryExists)
-                {
-                    throw new Exception(CategoryConstants.DoesNotExistMessage);
-                }
-
                 var product = this.mapper.Map<CreateProductViewModel, Product>(createProductViewModel);
-                var productCategory = new ProductCategory
+
+                if (createProductViewModel.CategoryId.HasValue)
                 {
-                    CategoryId = createProductViewModel.CategoryId
-                };
-                product
-                    .ProductCategories
-                    .Add(productCategory);
+                    var categoryExists = await this.dbContext
+                        .Categories
+                        .AnyAsync(x => x.Id == createProductViewModel.CategoryId);
+
+                    if (categoryExists)
+                    {
+                        var productCategory = new ProductCategory
+                        {
+                            CategoryId = createProductViewModel.CategoryId.Value
+                        };
+                        product
+                            .ProductCategories
+                            .Add(productCategory);
+                    }
+                }
 
                 await this.dbContext
                     .Products
@@ -139,31 +151,95 @@ namespace MyOnlineShop.Areas.Admin.Controllers
 
             }
 
-            return View(createProductViewModel);
+            return this.View(createProductViewModel);
         }
 
-        public ActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            return View();
+            var productExists = await this.dbContext
+               .Products
+               .AnyAsync(x => x.Id == id);
+
+            if (!productExists)
+            {
+                return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
+            }
+
+            var editProductViewModel = this.dbContext
+                .Products
+                .Where(x => x.Id == id)
+                .Select(x => new EditProductViewModel
+                {
+                    Id = x.Id,
+                    Description = x.Description,
+                    Name = x.Name,
+                    Price = x.Price,
+                    Weight = x.Weight,
+                    StockAvailable = x.StockAvailable,
+                    ImageViewModels = x
+                            .Images
+                            .Select(i => new ProductImageViewModel
+                            {
+                                Id = i.Id,
+                                Name = i.Name
+                            })
+                            .ToList()
+                })
+                .ToListAsync();
+
+            return this.View(editProductViewModel);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(EditProductViewModel editProductViewModel)
+        public async Task<IActionResult> Edit(EditProductViewModel editProductViewModel)
         {
-            try
+            var productExists = await this.dbContext
+               .Products
+               .AnyAsync(x => x.Id == editProductViewModel.Id);
+
+            if (!productExists)
             {
-                return RedirectToAction(nameof(Index));
+                return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
             }
-            catch
+
+            if (this.ModelState.IsValid)
             {
-                return View();
+                var product = await this.dbContext
+                    .Products
+                    .Include(x => x.Images)
+                    .FirstOrDefaultAsync(x => x.Id == editProductViewModel.Id);
+
+                this.mapper.Map(editProductViewModel, product);
+
+                this.dbContext
+                    .Products
+                    .Update(product);
+
+                await this.dbContext
+                .SaveChangesAsync();
+
+                return this.RedirectToAction(nameof(Index));
             }
+
+
+            return this.View(editProductViewModel);
         }
 
-        public ActionResult Delete(int id)
+        [HttpPost]
+        public async Task<IActionResult> Archive(int id)
         {
-            return View();
+            var product = await this.dbContext
+                .Products
+                .FindAsync(id);
+
+            if (product == null)
+            {
+                throw new ArgumentException(ProductConstants.ProductDoesNotExistMessage);
+            }
+
+            product.IsArchived = true;
+
+            return this.RedirectToAction(nameof(Index));
         }
     }
 }

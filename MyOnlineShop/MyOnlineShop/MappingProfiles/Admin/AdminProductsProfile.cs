@@ -14,6 +14,9 @@ namespace MyOnlineShop.MappingProfiles.Admin
 
             this.CreateMap<CreateProductViewModel, Product>()
                 .ForMember(dest => dest.ProductCategories, opts => opts.Ignore());
+
+            this.CreateMap<EditProductViewModel, Product>()
+                .ForMember(dest => dest.ProductCategories, opts => opts.Ignore());
         }
     }
 }

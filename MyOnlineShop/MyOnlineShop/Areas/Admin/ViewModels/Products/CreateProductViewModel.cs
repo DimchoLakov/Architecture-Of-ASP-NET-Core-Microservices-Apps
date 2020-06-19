@@ -22,8 +22,7 @@ namespace MyOnlineShop.Areas.Admin.ViewModels.Products
         [Required]
         public string Description { get; set; }
 
-        [Required]
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public ICollection<SelectListItem> Categories { get; set; }
 
         public IFormFileWrapper FileWrapper { get; set; }
