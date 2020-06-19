@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Areas.Admin.Constants;
 using MyOnlineShop.Areas.Admin.ViewModels.Images;
@@ -11,6 +12,8 @@ using System.Threading.Tasks;
 
 namespace MyOnlineShop.Areas.Admin.Controllers
 {
+    [Authorize(Roles = "Administrator")]
+    [Area("Admin")]
     public class ImagesController : Controller
     {
         private readonly ApplicationDbContext dbContext;
@@ -31,7 +34,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                 return this.BadRequest(ImageConstants.ImageDoesNotExistMessage);
             }
 
-            return new FileContentResult(image.Content, "image/jpeg");
+            return new FileContentResult(image.Content, $"image/{image.MimeType}");
         }
 
         [HttpPost]

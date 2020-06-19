@@ -1,19 +1,25 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Areas.Admin.Constants;
+using MyOnlineShop.Areas.Admin.ViewModels.Pagination;
 using MyOnlineShop.Areas.Admin.ViewModels.Products;
 using MyOnlineShop.Data;
+using MyOnlineShop.Data.Models.Galleries;
 using MyOnlineShop.Data.Models.Products;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static MyOnlineShop.Areas.Admin.Constants.ProductConstants;
 
 namespace MyOnlineShop.Areas.Admin.Controllers
 {
     [Authorize(Roles = "Administrator")]
+    [Area("Admin")]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext dbContext;
@@ -25,12 +31,52 @@ namespace MyOnlineShop.Areas.Admin.Controllers
             this.mapper = mapper;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? currentPage = 1, string search = null)
         {
-            var productIndexViewModels = await this.dbContext
+            int count = await this.dbContext
                 .Products
-                .Where(x => !x.IsArchived)
-                .Take(ProductConstants.MaxTakeCount)
+                .CountAsync();
+
+            int size = MaxTakeCount;
+            int totalPages = (int)Math.Ceiling(decimal.Divide(count, size));
+
+            if (currentPage < 1)
+            {
+                currentPage = 1;
+            }
+            if (currentPage > totalPages)
+            {
+                currentPage = totalPages;
+            }
+
+            int skip = (int)(currentPage - 1) * size;
+            if (skip < 0)
+            {
+                skip = 0;
+            }
+            int take = size;
+
+            var query = this.dbContext
+                .Products
+                .Where(x => !x.IsArchived);
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query
+                    .Where(x => x.Name.ToLower().Contains(search.ToLower()));
+            }
+
+            var productPaginationViewModel = new ProductPaginationViewModel
+            {
+                Search = search,
+                PaginationViewModel = new PaginationViewModel
+                {
+                    CurrentPage = currentPage.Value,
+                    TotalPages = totalPages
+                },
+                ProductIndexViewModels = await query
+                .Skip(skip)
+                .Take(take)
+                .Take(MaxTakeCount)
                 .Select(x => new ProductIndexViewModel()
                 {
                     Id = x.Id,
@@ -51,9 +97,10 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                         .FirstOrDefault(),
                     }
                 })
-                .ToListAsync();
+                .ToListAsync()
+            };
 
-            return this.View(productIndexViewModels);
+            return this.View(productPaginationViewModel);
         }
 
         public async Task<IActionResult> Details(int id)
@@ -142,9 +189,45 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                     }
                 }
 
+                if (createProductViewModel.Files.Any())
+                {
+                    var imageTypes = new string[]
+                    {
+                        ".tif", ".tiff", ".bmp", ".jpg", ".jpeg", ".gif", ".png", ".eps", ".raw", ".cr2", ".nef", ".orf", ".sr2"
+                    };
+
+                    var count = 0;
+                    foreach (IFormFile file in createProductViewModel.Files)
+                    {
+                        count++;
+                        string imageExtension = Path.GetExtension(file.FileName);
+                        if (!imageTypes.Contains(imageExtension))
+                        {
+                            return this.BadRequest(string.Format(ImageConstants.ImageTypeNotAllowedMessage, imageExtension));
+                        }
+
+                        var image = new Image
+                        {
+                            Name = file.FileName,
+                            IsPrimary = count == 1,
+                            MimeType = imageExtension
+                        };
+
+                        using var memoryStream = new MemoryStream();
+                        file.CopyTo(memoryStream);
+                        byte[] fileBytes = memoryStream.ToArray();
+                        image.Content = fileBytes;
+
+                        product.Images.Add(image);
+                    }
+                }
+
                 await this.dbContext
                     .Products
                     .AddAsync(product);
+
+                await this.dbContext
+                    .SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
 

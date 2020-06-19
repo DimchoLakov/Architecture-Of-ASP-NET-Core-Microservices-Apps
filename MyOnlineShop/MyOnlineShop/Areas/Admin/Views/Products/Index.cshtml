@@ -1,4 +1,58 @@
-﻿@model ProductIndexViewModel
+﻿@model ProductPaginationViewModel
 
 @{
+    ViewData["Title"] = "Manage Products";
 }
+    <style>
+        img{
+            max-height: 50%;
+        }
+    </style>
+
+<div class="row mt-3 mb-3">
+    <div class="col-md-5">
+        <form method="get" asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-search="@Model.PaginationViewModel.Search">
+            <div class="form-row align-items-center">
+                <div class="col-auto d-md-flex flex-grow-1">
+                    <label asp-for="Search" class="align-self-md-center mr-2"></label>
+                    <input asp-for="Search" placeholder="Laptop" class="form-control mb-2" />
+                </div>
+                <div class="col-auto align-self-md-end">
+                    <button type="submit" class="btn btn-primary mb-2">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-3">
+        <a asp-area="Admin" asp-controller="Products" asp-action="Create" class="btn btn-primary mb-2">Create New Product</a>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-md-12">
+        <h2 class="mb-3">Products</h2>
+
+        @for (int i = 0; i < Model.ProductIndexViewModels.Count; i += 4)
+        {
+            <div class="card-deck mt-2">
+                @for (int k = 0; k <= 3 && k + i < Model.ProductIndexViewModels.Count(); k++)
+                {
+                    <div class="card p-0">
+                        <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@Model.ProductIndexViewModels[k + i].Id">
+                            <img class="card-img-top" src="@Url.Content($"~/Admin/Images/Get/?id={Model.ProductIndexViewModels[k + i].ImageViewModel.Id}")" alt="@Model.ProductIndexViewModels[k + i].ImageViewModel.Name">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">Name: @Model.ProductIndexViewModels[k + i].Name</h5>
+                            <p class="card-text">Description: @Model.ProductIndexViewModels[k + i].Description</p>
+                            <p class="card-text">Price: @Model.ProductIndexViewModels[k + i].Price</p>
+                        </div>
+                        <div class="card-footer">
+                            <a asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-id="@Model.ProductIndexViewModels[k + i].Id">Details</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<partial name="_PaginationPartial" model="Model.PaginationViewModel" />
