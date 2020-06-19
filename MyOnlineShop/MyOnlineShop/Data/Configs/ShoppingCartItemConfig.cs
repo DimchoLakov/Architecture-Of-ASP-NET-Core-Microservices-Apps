@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MyOnlineShop.Models.ShoppingCarts;
+using MyOnlineShop.Data.Models.ShoppingCarts;
 
 namespace MyOnlineShop.Data.Configs
 {

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyOnlineShop.Areas.Admin.ViewModels.Products;
-using MyOnlineShop.Models.Products;
+using MyOnlineShop.Data.Models.Galleries;
+using MyOnlineShop.Data.Models.Products;
 
 namespace MyOnlineShop.MappingProfiles.Admin
 {

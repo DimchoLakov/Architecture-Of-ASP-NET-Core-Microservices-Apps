@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Areas.Admin.Constants;
 using MyOnlineShop.Areas.Admin.ViewModels.Images;
 using MyOnlineShop.Data;
-using MyOnlineShop.Models.Products;
+using MyOnlineShop.Data.Models.Galleries;
 using System;
 using System.IO;
 using System.Linq;
@@ -61,11 +61,13 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                         return this.BadRequest(string.Format(ImageConstants.ImageTypeNotAllowedMessage, imageExtension));
                     }
 
-                    var image = new Image();
-                    image.Name = addImageViewModel.Name;
-                    image.IsPrimary = addImageViewModel.IsPrimary;
-                    image.MimeType = imageExtension;
-                    image.ProductId = productId;
+                    var image = new Image
+                    {
+                        Name = addImageViewModel.Name,
+                        IsPrimary = addImageViewModel.IsPrimary,
+                        MimeType = imageExtension,
+                        ProductId = productId
+                    };
 
                     using var memoryStream = new MemoryStream();
                     addImageViewModel.File.CopyTo(memoryStream);

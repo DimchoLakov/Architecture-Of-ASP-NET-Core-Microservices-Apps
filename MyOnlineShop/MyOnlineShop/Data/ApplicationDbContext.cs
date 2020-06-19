@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Data.Configs;
-using MyOnlineShop.Models;
-using MyOnlineShop.Models.Customers;
-using MyOnlineShop.Models.Products;
-using MyOnlineShop.Models.ShoppingCarts;
+using MyOnlineShop.Data.Models.Categories;
+using MyOnlineShop.Data.Models.Customers;
+using MyOnlineShop.Data.Models.Galleries;
+using MyOnlineShop.Data.Models.Orders;
+using MyOnlineShop.Data.Models.Products;
+using MyOnlineShop.Data.Models.ShoppingCarts;
 
 namespace MyOnlineShop.Data
 {
