@@ -3,10 +3,11 @@
 @{
     ViewData["Title"] = "Product Detail";
 }
+<h4 class="text-danger">Admin</h4>
 
 <div class="row mb-2">
     <div class="col-md-4">
-        <img src="@Url.Content($"~/Admin/Images/Get/?id={Model.PrimaryImageViewModel.Id}")" alt="@Model.PrimaryImageViewModel.Name" class="card-img">
+        <img src="@Url.Content($"~/Images/Get/?id={Model.PrimaryImageViewModel.Id}")" alt="@Model.PrimaryImageViewModel.Name" class="card-img">
     </div>
     <div class="col-md-8">
         <h5>@Model.Name</h5>
@@ -25,7 +26,7 @@
             @foreach (var imageViewModel in Model.ImageViewModels)
             {
                 <div class="product-image">
-                    <img src="@Url.Content($"~/Admin/Images/Get/?id={imageViewModel.Id}")" alt="@imageViewModel.Name" class="img-fluid"/>
+                    <img src="@Url.Content($"~/Images/Get/?id={imageViewModel.Id}")" alt="@imageViewModel.Name" class="img-fluid" />
                 </div>
             }
         </div>

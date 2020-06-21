@@ -1,0 +1,38 @@
+﻿@model ShoppingCartIndexViewModel
+
+@{
+    ViewData["Title"] = "Your Trolley";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="mb-2">
+            @if (Model.CartItemViewModels.Any())
+            {
+                <form method="post" asp-area="" asp-controller="ShoppingCarts" asp-action="Clear" class="mb-2">
+                    <button type="submit" class="btn btn-sm btn-danger">Clear Trolley</button>
+                </form>
+            }
+        </div>
+        @foreach (var cartItem in Model.CartItemViewModels)
+        {
+            <div class="cart-item mb-2 d-md-inline-block">
+                <p>@cartItem.ProductName</p>
+                <p>$@cartItem.ProductPrice x @cartItem.Quantity = $@(cartItem.Total)</p>
+                <form method="post" asp-area="" asp-controller="ShoppingCarts" asp-action="RemoveItem" class="mb-2">
+                    <input type="hidden" name="ProductId" value="@cartItem.ProductId" />
+                    <button type="submit" class="btn btn-sm btn-danger">Remove Item</button>
+                </form>
+            </div>
+        }
+        <p><b>Total:</b> $@Model.Total</p>
+    </div>
+    <div class="col-md-12">
+        @if (Model.CartItemViewModels.Any())
+        {
+            <form method="get" asp-area="" asp-controller="ShoppingCarts" asp-action="Checkout" class="mb-2">
+                <button type="submit" class="btn btn-success text-uppercase">Checkout</button>
+            </form>
+        }
+    </div>
+</div>

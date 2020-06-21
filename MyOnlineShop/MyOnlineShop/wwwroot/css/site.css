@@ -72,26 +72,26 @@ body {
     white-space: nowrap;
     line-height: 60px; /* Vertically center the text there */
 }
- 
+
 .card-img-wrapper {
     position: relative;
     overflow: hidden;
 }
 
-.card-img-wrapper img {
-    position: absolute;
-    top: 25%;
-    left: 50%;
-    max-width: 100%;
-    height: auto;
-    transform: translate(-50%, -25%);
-}
+    .card-img-wrapper img {
+        position: absolute;
+        top: 25%;
+        left: 50%;
+        max-width: 100%;
+        height: auto;
+        transform: translate(-50%, -25%);
+    }
 
-.card-img-wrapper::after{
-    display: block;
-    content: '';
-    padding-top: 56.25%;
-}
+    .card-img-wrapper::after {
+        display: block;
+        content: '';
+        padding-top: 56.25%;
+    }
 
 .product-image {
     width: 10rem;
@@ -100,6 +100,12 @@ body {
     overflow: hidden;
 }
 
-.product-image:not(:last-child) {
-    margin-right: 0.3rem;
+    .product-image:not(:last-child) {
+        margin-right: 0.3rem;
+    }
+
+.cart-item {
+    border: 1px solid black;
+    border-radius: 0.2rem;
+    padding: 0.5rem 0.5rem 0 0.5rem;
 }

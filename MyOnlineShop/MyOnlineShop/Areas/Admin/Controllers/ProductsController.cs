@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MyOnlineShop.Areas.Admin.Constants;
 using MyOnlineShop.Areas.Admin.ViewModels.Pagination;
 using MyOnlineShop.Areas.Admin.ViewModels.Products;
 using MyOnlineShop.Data;
@@ -14,7 +13,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using static MyOnlineShop.Areas.Admin.Constants.ProductConstants;
+using static MyOnlineShop.Constants.ProductConstants;
+using static MyOnlineShop.Constants.ImageConstants;
 
 namespace MyOnlineShop.Areas.Admin.Controllers
 {
@@ -111,7 +111,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
 
             if (!productExists)
             {
-                return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
+                return this.BadRequest(ProductDoesNotExistMessage);
             }
 
             var productDetailsViewModel = await this.dbContext
@@ -184,7 +184,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
 
                 if (productNameExists)
                 {
-                    throw new Exception(string.Format(ProductConstants.ProductAlreadyExists, createProductViewModel.Name));
+                    throw new Exception(string.Format(ProductAlreadyExists, createProductViewModel.Name));
                 }
 
                 var product = this.mapper.Map<CreateProductViewModel, Product>(createProductViewModel);
@@ -221,7 +221,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                         string imageExtension = Path.GetExtension(file.FileName);
                         if (!imageTypes.Contains(imageExtension))
                         {
-                            return this.BadRequest(string.Format(ImageConstants.ImageTypeNotAllowedMessage, imageExtension));
+                            return this.BadRequest(string.Format(ImageTypeNotAllowedMessage, imageExtension));
                         }
 
                         var image = new Image
@@ -262,7 +262,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
 
             if (!productExists)
             {
-                return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
+                return this.BadRequest(ProductDoesNotExistMessage);
             }
 
             var editProductViewModel = await this.dbContext
@@ -316,7 +316,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
 
             if (!productExists)
             {
-                return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
+                return this.BadRequest(ProductDoesNotExistMessage);
             }
 
             if (this.ModelState.IsValid)
@@ -351,7 +351,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
 
             if (product == null)
             {
-                throw new ArgumentException(ProductConstants.ProductDoesNotExistMessage);
+                throw new ArgumentException(ProductDoesNotExistMessage);
             }
 
             product.IsArchived = true;

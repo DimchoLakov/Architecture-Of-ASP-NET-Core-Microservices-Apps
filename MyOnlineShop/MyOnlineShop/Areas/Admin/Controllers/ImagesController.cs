@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyOnlineShop.Areas.Admin.Constants;
 using MyOnlineShop.Areas.Admin.ViewModels.Images;
 using MyOnlineShop.Data;
 using MyOnlineShop.Data.Models.Galleries;
@@ -9,6 +8,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static MyOnlineShop.Constants.ImageConstants;
+using static MyOnlineShop.Constants.ProductConstants;
 
 namespace MyOnlineShop.Areas.Admin.Controllers
 {
@@ -23,20 +24,6 @@ namespace MyOnlineShop.Areas.Admin.Controllers
             this.dbContext = dbContext;
         }
 
-        public async Task<IActionResult> Get(int id)
-        {
-            var image = await this.dbContext
-                .Images
-                .FindAsync(id);
-
-            if (image == null)
-            {
-                return this.BadRequest(ImageConstants.ImageDoesNotExistMessage);
-            }
-
-            return new FileContentResult(image.Content, $"image/{image.MimeType}");
-        }
-
         [HttpPost]
         public async Task<IActionResult> AddToProduct(AddImageViewModel addImageViewModel, int productId)
         {
@@ -46,7 +33,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
 
             if (!productExists)
             {
-                return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
+                return this.BadRequest(ProductDoesNotExistMessage);
             }
 
             if (this.ModelState.IsValid)
@@ -61,7 +48,7 @@ namespace MyOnlineShop.Areas.Admin.Controllers
                     string imageExtension = Path.GetExtension(addImageViewModel.File.FileName);
                     if (!imageTypes.Contains(imageExtension))
                     {
-                        return this.BadRequest(string.Format(ImageConstants.ImageTypeNotAllowedMessage, imageExtension));
+                        return this.BadRequest(string.Format(ImageTypeNotAllowedMessage, imageExtension));
                     }
 
                     var image = new Image

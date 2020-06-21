@@ -1,4 +1,4 @@
-﻿namespace MyOnlineShop.Areas.Admin.Constants
+﻿namespace MyOnlineShop.Constants
 {
     public class ImageConstants
     {

@@ -46,6 +46,13 @@ namespace MyOnlineShop
             .AddDefaultTokenProviders()
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddSession(options => 
+            {
+                options.Cookie.IsEssential = true;
+                options.Cookie.HttpOnly = true;
+                options.IdleTimeout = TimeSpan.FromHours(8);
+            });
+
             services.AddRouting();
 
             services.AddAuthentication();
@@ -111,6 +118,8 @@ namespace MyOnlineShop
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseStatusCodePagesWithReExecute("/Home/Error/", "?/StatusCode={0}");
+
+            app.UseSession();
 
             app.UseRouting();
 

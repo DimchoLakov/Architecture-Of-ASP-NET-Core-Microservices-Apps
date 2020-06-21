@@ -1,0 +1,86 @@
+﻿@model ShoppingCartOrderAddressViewModel
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        @foreach (var cartItem in Model.ShoppingCartIndexViewModel.CartItemViewModels)
+        {
+            <div class="cart-item mb-2 d-md-inline-block">
+                <p>@cartItem.ProductName</p>
+                <p>$@cartItem.ProductPrice x @cartItem.Quantity = $@(cartItem.Total)</p>
+            </div>
+        }
+        <p><b>Total:</b> $@Model.ShoppingCartIndexViewModel.Total</p>
+        @if (!Model.OrderAddressViewModel.IsAddressAvailable)
+        {
+            <form method="post" asp-area="" asp-controller="ShoppingCarts" asp-action="Checkout" class="mb-2">
+                <div class="form-group row">
+                    <label asp-for="OrderAddressViewModel.AddressLine" class="col-md-2 col-form-label"></label>
+                    <div class="col-md-6">
+                        <input asp-for="OrderAddressViewModel.AddressLine" class="form-control" placeholder="Address line..." required>
+                        <span asp-validation-for="OrderAddressViewModel.AddressLine" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="OrderAddressViewModel.PostCode" class="col-md-2 col-form-label"></label>
+                    <div class="col-md-6">
+                        <input asp-for="OrderAddressViewModel.PostCode" class="form-control" placeholder="Post Code..." required>
+                        <span asp-validation-for="OrderAddressViewModel.PostCode" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="OrderAddressViewModel.Town" class="col-md-2 col-form-label"></label>
+                    <div class="col-md-6">
+                        <input asp-for="OrderAddressViewModel.Town" class="form-control" placeholder="Town..." required>
+                        <span asp-validation-for="OrderAddressViewModel.Town" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="OrderAddressViewModel.Country" class="col-md-2 col-form-label"></label>
+                    <div class="col-md-6">
+                        <input asp-for="OrderAddressViewModel.Country" class="form-control" placeholder="Country..." required>
+                        <span asp-validation-for="OrderAddressViewModel.Country" class="text-danger"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success text-uppercase">Place Order</button>
+            </form>
+        }
+        else
+        {
+            <form method="post" asp-area="" asp-controller="ShoppingCarts" asp-action="Checkout" class="mb-2">
+                <div class="form-group row">
+                    <label asp-for="OrderAddressViewModel.AddressLine" class="col-md-2 col-form-label"></label>
+                    <div class="col-md-6">
+                        <input asp-for="OrderAddressViewModel.AddressLine" class="form-control" placeholder="Address line..." required readonly>
+                        <span asp-validation-for="OrderAddressViewModel.AddressLine" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="OrderAddressViewModel.PostCode" class="col-md-2 col-form-label"></label>
+                    <div class="col-md-6">
+                        <input asp-for="OrderAddressViewModel.PostCode" class="form-control" placeholder="Post Code..." required readonly>
+                        <span asp-validation-for="OrderAddressViewModel.PostCode" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="OrderAddressViewModel.Town" class="col-md-2 col-form-label"></label>
+                    <div class="col-md-6">
+                        <input asp-for="OrderAddressViewModel.Town" class="form-control" placeholder="Town..." required readonly>
+                        <span asp-validation-for="OrderAddressViewModel.Town" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="OrderAddressViewModel.Country" class="col-md-2 col-form-label"></label>
+                    <div class="col-md-6">
+                        <input asp-for="OrderAddressViewModel.Country" class="form-control" placeholder="Country..." required readonly>
+                        <span asp-validation-for="OrderAddressViewModel.Country" class="text-danger"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success text-uppercase">Place Order</button>
+            </form>
+        }
+    </div>
+</div>

@@ -1,0 +1,43 @@
+﻿@model DetailsViewModel
+
+@{
+    ViewData["Title"] = "Product Detail";
+}
+
+<div class="row mb-2">
+    <div class="col-md-4">
+        <img src="@Url.Content($"~/Images/Get/?id={Model.PrimaryImageViewModel.Id}")" alt="@Model.PrimaryImageViewModel.Name" class="card-img">
+    </div>
+    <div class="col-md-8">
+        <h5>@Model.Name</h5>
+        <p>Price: $@Model.Price</p>
+        <p>Stock Available: @Model.StockAvailable</p>
+        <p>Weight in Kg: @Model.Weight</p>
+        <p>Description: @Model.Description</p>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-md-12">
+        <div class="d-md-flex flex-md-row flex-md-wrap">
+            @foreach (var imageViewModel in Model.ImageViewModels)
+            {
+                <div class="product-image">
+                    <img src="@Url.Content($"~/Images/Get/?id={imageViewModel.Id}")" alt="@imageViewModel.Name" class="img-fluid"/>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        <a asp-area="" asp-controller="Products" asp-action="Index" asp-route-currentPage="@Model.FromPageNumber" class="btn btn-secondary w-100">Back</a>
+    </div>
+    <div class="col-md-4 offset-md-2">
+        <form method="post" asp-area="" asp-controller="ShoppingCarts" asp-action="AddProduct">
+            <input type="hidden" name="ProductId" value="@Model.Id" />
+            <input type="hidden" name="FromPage" value="@Model.FromPageNumber" />
+            <button class="btn btn-primary w-100">Add to Trolley</button>
+        </form>
+    </div>
+</div>
