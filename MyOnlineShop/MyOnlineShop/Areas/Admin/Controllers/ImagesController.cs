@@ -8,13 +8,15 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 using static MyOnlineShop.Constants.ImageConstants;
 using static MyOnlineShop.Constants.ProductConstants;
+using static MyOnlineShop.Constants.AdminConstants;
 
 namespace MyOnlineShop.Areas.Admin.Controllers
 {
-    [Authorize(Roles = "Administrator")]
-    [Area("Admin")]
+    [Authorize(Roles = AdministratorRole)]
+    [Area(AdminArea)]
     public class ImagesController : Controller
     {
         private readonly ApplicationDbContext dbContext;

@@ -233,6 +233,7 @@ namespace MyOnlineShop.Controllers
             var order = new Order
             {
                 DeliveryCost = random.Next(1, 6),
+                Date = DateTime.UtcNow,
                 Customer = currentUser
             };
             if (!currentUser.Addresses.Any())

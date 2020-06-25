@@ -1,0 +1,27 @@
+﻿@model OrderDetailsViewModel
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <p>Order Date: @Model.Date</p>
+        <p><b>Postage:</b> $@Model.DeliveryCost.ToString("N2")</p>
+        <p><b>Order Total:</b> $@Model.Total.ToString("N2")</p>
+    </div>
+    @foreach (var orderItemDetailsViewModels in Model.OrderItemDetailsViewModels)
+    {
+        <div class="col-md-auto mb-2">
+            <div class="media">
+                <img src="@Url.Content($"~/Images/Get/?id={orderItemDetailsViewModels.PrimaryImageId}")" alt="@orderItemDetailsViewModels.PrimaryImageName" />
+            </div>
+            <div class="order-item no-top-border">
+                <p><b>@orderItemDetailsViewModels.ProductName</b></p>
+                <p>Description: @orderItemDetailsViewModels.ProductDescription</p>
+                <p>Price: @orderItemDetailsViewModels.ProductPrice.ToString("N2")</p>
+                <p>Quanity: @orderItemDetailsViewModels.Quantity</p>
+            </div>
+        </div>
+    }
+</div>

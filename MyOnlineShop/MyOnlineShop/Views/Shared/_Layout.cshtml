@@ -36,6 +36,9 @@
                             <li class="nav-item">
                                 <a asp-area="" asp-controller="ShoppingCarts" asp-action="Index" class="nav-link text-dark">Shopping Cart (<vc:cart-items-count></vc:cart-items-count>)</a>
                             </li>
+                            <li class="nav-item">
+                                <a asp-area="" asp-controller="Orders" asp-action="Index" class="nav-link text-dark">My Orders</a>
+                            </li>
                         </ul>
                     }
                     else
@@ -43,6 +46,9 @@
                         <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
                                 <a asp-area="" asp-controller="ShoppingCarts" asp-action="Index" class="nav-link text-dark">Shopping Cart (<vc:cart-items-count></vc:cart-items-count>)</a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-area="" asp-controller="Orders" asp-action="Index" class="nav-link text-dark">My Orders</a>
                             </li>
                         </ul>
                     }

@@ -1,4 +1,5 @@
 ﻿using MyOnlineShop.Data.Models.Customers;
+using System;
 using System.Collections.Generic;
 
 namespace MyOnlineShop.Data.Models.Orders
@@ -13,6 +14,8 @@ namespace MyOnlineShop.Data.Models.Orders
         public int Id { get; set; }
 
         public decimal DeliveryCost { get; set; }
+
+        public DateTime Date { get; set; }
 
         public int DeliveryAddressId { get; set; }
         public Address DeliveryAddress { get; set; }

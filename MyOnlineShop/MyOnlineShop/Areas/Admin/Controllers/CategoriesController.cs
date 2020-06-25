@@ -9,10 +9,12 @@ using MyOnlineShop.Data.Models.Categories;
 using System.Linq;
 using System.Threading.Tasks;
 
+using static MyOnlineShop.Constants.AdminConstants;
+
 namespace MyOnlineShop.Areas.Admin.Controllers
 {
-    [Authorize(Roles = "Administrator")]
-    [Area("Admin")]
+    [Authorize(Roles = AdministratorRole)]
+    [Area(AdminArea)]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext dbContext;

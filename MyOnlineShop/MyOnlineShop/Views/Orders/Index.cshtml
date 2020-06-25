@@ -1,0 +1,17 @@
+﻿@model IEnumerable<OrderIndexViewModel>
+
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="row">
+    @foreach (var orderIndexViewModel in Model)
+    {
+        <div class="col-md-auto order-item mr-2 mb-2">
+            <a asp-area="" asp-controller="Orders" asp-action="Details" asp-route-id="@orderIndexViewModel.Id">
+                <p>@orderIndexViewModel.Date</p>
+                <p>@orderIndexViewModel.Orders</p>
+            </a>
+        </div>
+    }
+</div>
