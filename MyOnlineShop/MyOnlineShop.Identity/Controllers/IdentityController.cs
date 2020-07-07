@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyOnlineShop.Identity.Services.Identity;
-using MyOnlineShop.Identity.ViewModels;
+using MyOnlineShop.Identity.Models;
 using System.Threading.Tasks;
 
 using static MyOnlineShop.Common.Constants.Constants;

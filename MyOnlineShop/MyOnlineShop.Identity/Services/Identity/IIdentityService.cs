@@ -1,6 +1,6 @@
 ﻿namespace MyOnlineShop.Identity.Services.Identity
 {
-    using MyOnlineShop.Identity.ViewModels;
+    using MyOnlineShop.Identity.Models;
     using System.Threading.Tasks;
 
     public interface IIdentityService

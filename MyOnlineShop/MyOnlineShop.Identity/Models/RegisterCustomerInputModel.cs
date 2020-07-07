@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyOnlineShop.Identity.ViewModels
+namespace MyOnlineShop.Identity.Models
 {
     public class RegisterCustomerInputModel
     {

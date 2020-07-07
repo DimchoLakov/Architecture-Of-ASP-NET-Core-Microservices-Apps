@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace MyOnlineShop.Identity.ViewModels
+namespace MyOnlineShop.Identity.Models
 {
     public class RegisterCustomerResultModel
     {

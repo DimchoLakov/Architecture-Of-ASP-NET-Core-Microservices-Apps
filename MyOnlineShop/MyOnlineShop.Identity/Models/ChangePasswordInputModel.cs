@@ -1,4 +1,4 @@
-﻿namespace MyOnlineShop.Identity.ViewModels
+﻿namespace MyOnlineShop.Identity.Models
 {
     public class ChangePasswordInputModel
     {

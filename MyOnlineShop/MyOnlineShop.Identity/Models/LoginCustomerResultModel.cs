@@ -1,16 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace MyOnlineShop.Identity.ViewModels
+namespace MyOnlineShop.Identity.Models
 {
-    public class ChangePasswordResultModel
+    public class LoginCustomerResultModel
     {
-        public ChangePasswordResultModel()
+        public LoginCustomerResultModel()
         {
             this.Errors = new List<string>();
         }
-
+ 
         public bool Succeeded { get; set; }
+
+        public string Token { get; set; }
 
         public IList<string> Errors { get; set; }
     }

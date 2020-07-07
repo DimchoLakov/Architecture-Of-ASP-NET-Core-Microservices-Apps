@@ -2,7 +2,7 @@
 {
     using Microsoft.AspNetCore.Identity;
     using MyOnlineShop.Identity.Data.Models;
-    using MyOnlineShop.Identity.ViewModels;
+    using MyOnlineShop.Identity.Models;
     using System.Linq;
     using System.Threading.Tasks;
 
