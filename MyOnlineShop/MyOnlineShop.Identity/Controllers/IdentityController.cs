@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using MyOnlineShop.Identity.Services.Identity;
+﻿using Microsoft.AspNetCore.Mvc;
+using MyOnlineShop.Common.Controllers;
 using MyOnlineShop.Identity.Models;
+using MyOnlineShop.Identity.Services.Identity;
 using System.Threading.Tasks;
-
-using static MyOnlineShop.Common.Constants.Constants;
 
 namespace MyOnlineShop.Identity.Controllers
 {
-    [Authorize(Roles = AdministratorRoleName)]
     public class IdentityController : ApiController
     {
         private readonly IIdentityService identityService;
@@ -18,7 +15,7 @@ namespace MyOnlineShop.Identity.Controllers
             this.identityService = identityService;
         }
 
-        [HttpPost]
+        [HttpPost(nameof(Login))]
         public async Task<ActionResult<string>> Login(LoginCustomerInputModel loginCustomerInputModel)
         {
             var result = await this.identityService.LoginAsync(loginCustomerInputModel);
@@ -31,7 +28,7 @@ namespace MyOnlineShop.Identity.Controllers
             return result.Token;
         }
 
-        [HttpPost]
+        [HttpPost(nameof(Register))]
         public async Task<ActionResult<string>> Register(RegisterCustomerInputModel registerCustomerInputModel)
         {
             var result = await this.identityService.RegisterAsync(registerCustomerInputModel);
