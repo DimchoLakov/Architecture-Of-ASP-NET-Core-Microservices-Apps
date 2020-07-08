@@ -79,5 +79,27 @@ namespace MyOnlineShop.Areas.Admin.Controllers
 
             return this.BadRequest();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var image = await this.dbContext
+                .Images
+                .FindAsync(id);
+
+            if (image == null)
+            {
+                return this.BadRequest(ImageDoesNotExistMessage);
+            }
+
+            this.dbContext
+                .Images
+                .Remove(image);
+
+            await this.dbContext
+                .SaveChangesAsync();
+
+            return this.Redirect("/Admin/Products/Index");
+        }
     }
 }
