@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyOnlineShop.Identity", "My
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyOnlineShop.Common", "MyOnlineShop.Common\MyOnlineShop.Common.csproj", "{35EFAC6B-B090-4357-8F3B-15FFB316D4D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyOnlineShop.Ordering", "MyOnlineShop.Ordering\MyOnlineShop.Ordering.csproj", "{AFB83215-B8E2-4C6A-B220-4BD00F0BEC25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyOnlineShop.Ordering", "MyOnlineShop.Ordering\MyOnlineShop.Ordering.csproj", "{AFB83215-B8E2-4C6A-B220-4BD00F0BEC25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyOnlineShop.Catalog", "MyOnlineShop.Catalog\MyOnlineShop.Catalog.csproj", "{0DA0002C-D9D1-4750-8631-34CFBFDFFECB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{AFB83215-B8E2-4C6A-B220-4BD00F0BEC25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFB83215-B8E2-4C6A-B220-4BD00F0BEC25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFB83215-B8E2-4C6A-B220-4BD00F0BEC25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DA0002C-D9D1-4750-8631-34CFBFDFFECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DA0002C-D9D1-4750-8631-34CFBFDFFECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DA0002C-D9D1-4750-8631-34CFBFDFFECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DA0002C-D9D1-4750-8631-34CFBFDFFECB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
