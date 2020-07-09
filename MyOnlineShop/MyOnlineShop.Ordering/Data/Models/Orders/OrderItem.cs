@@ -1,6 +1,4 @@
-﻿using MyOnlineShop.Ordering.Data.Models.Products;
-
-namespace MyOnlineShop.Ordering.Data.Models.Orders
+﻿namespace MyOnlineShop.Ordering.Data.Models.Orders
 {
     public class OrderItem
     {
