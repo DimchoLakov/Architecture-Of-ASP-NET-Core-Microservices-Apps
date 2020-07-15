@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject MyOnlineShop.Common.Services.ICurrentUserService CurrentUserService
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -18,7 +20,7 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <partial name="_LoginPartial" />
-                    @if (this.User.IsInRole("Administrator"))
+                    @if (this.CurrentUserService.IsAdministrator)
                     {
                         <ul class="navbar-nav flex-grow-1">
 

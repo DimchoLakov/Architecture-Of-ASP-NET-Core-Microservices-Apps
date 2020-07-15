@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MyOnlineShop.Catalog.Data.Models.ShoppingCarts
+namespace MyOnlineShop.Ordering.Data.Models.ShoppingCarts
 {
     public class ShoppingCart
     {
@@ -10,6 +10,8 @@ namespace MyOnlineShop.Catalog.Data.Models.ShoppingCarts
         }
 
         public string Id { get; set; }
+
+        public string UserId { get; set; }
 
         public ICollection<ShoppingCartItem> CartItems { get; set; }
     }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using MyOnlineShop.Common.Services;
 using System.Text;
 
 namespace MyOnlineShop.Common.Infrastructure
@@ -17,7 +18,7 @@ namespace MyOnlineShop.Common.Infrastructure
             services
                 .AddDatabase<TDbContext>(configuration)
                 .AddApplicationSettings(configuration)
-                .AddTokenAuthentication(configuration)
+                .AddJwtTokenAuthentication(configuration)
                 .AddControllers();
 
             return services;
@@ -40,7 +41,7 @@ namespace MyOnlineShop.Common.Infrastructure
                         config => config.BindNonPublicProperties = true);
         }
 
-        public static IServiceCollection AddTokenAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddJwtTokenAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             var secret = configuration
                 .GetSection(nameof(ApplicationSettings))
@@ -68,6 +69,7 @@ namespace MyOnlineShop.Common.Infrastructure
                 });
 
             services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             return services;
         }

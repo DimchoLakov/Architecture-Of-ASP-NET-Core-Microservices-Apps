@@ -24,10 +24,10 @@ namespace MyOnlineShop.Identity.DataSeed
             Task
                 .Run(async () =>
                 {
-                    var roleExists = await this.roleManager.RoleExistsAsync(Constants.AdministratorRoleName);
+                    var roleExists = await this.roleManager.RoleExistsAsync(AuthConstants.AdministratorRoleName);
                     if (!roleExists)
                     {
-                        var adminRole = new IdentityRole(Constants.AdministratorRoleName);
+                        var adminRole = new IdentityRole(AuthConstants.AdministratorRoleName);
 
                         await this.roleManager.CreateAsync(adminRole);
                     }
@@ -43,7 +43,7 @@ namespace MyOnlineShop.Identity.DataSeed
 
                         await userManager.CreateAsync(adminUser, "adminpass12");
 
-                        await userManager.AddToRoleAsync(adminUser, Constants.AdministratorRoleName);
+                        await userManager.AddToRoleAsync(adminUser, AuthConstants.AdministratorRoleName);
                     }    
                 })
                 .GetAwaiter()

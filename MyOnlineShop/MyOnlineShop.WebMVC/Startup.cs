@@ -2,22 +2,23 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MyOnlineShop.Common.Infrastructure;
+using MyOnlineShop.Common.Services;
 using MyOnlineShop.WebMVC.Data;
-using MyOnlineShop.WebMVC.Data.Models.Customers;
-using MyOnlineShop.WebMVC.Emails;
-using MyOnlineShop.WebMVC.MappingProfiles.Admin;
-using MyOnlineShop.WebMVC.SeedData;
+using MyOnlineShop.WebMVC.Services;
+using MyOnlineShop.WebMVC.Services.Identity;
+using MyOnlineShop.WebMVC.Services.Ordering;
 using Newtonsoft.Json;
+using Refit;
 using System;
+using System.Reflection;
 
-namespace MyOnlineShop
+namespace MyOnlineShop.WebMVC
 {
     public class Startup
     {
@@ -42,36 +43,34 @@ namespace MyOnlineShop
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddIdentity<Customer, IdentityRole>()
-            .AddDefaultTokenProviders()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            services.AddSession(options => 
+            services.AddSession(options =>
             {
                 options.Cookie.IsEssential = true;
                 options.Cookie.HttpOnly = true;
                 options.IdleTimeout = TimeSpan.FromHours(8);
             });
 
+            var serviceEndpoints = this.Configuration
+                .GetSection(nameof(ServiceEndpoints))
+                .Get<ServiceEndpoints>(config => config.BindNonPublicProperties = true);
+
+            services
+                .AddJwtTokenAuthentication(this.Configuration)
+                .AddScoped<ICurrentTokenService, CurrentTokenService>()
+                .AddTransient<JwtCookieAuthenticationMiddleware>();
+
+            services
+                .AddRefitClient<IIdentityService>()
+                .WithConfiguration(serviceEndpoints.Identity);
+
+            services
+                .AddRefitClient<IOrderingService>()
+                .WithConfiguration(serviceEndpoints.Ordering);
+
             services.AddRouting();
 
             services.AddAuthentication();
             services.AddAuthorization();
-
-            services.Configure<IdentityOptions>(options =>
-            {
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredUniqueChars = 0;
-                options.Password.RequireNonAlphanumeric = false;
-
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(5);
-                options.Lockout.MaxFailedAccessAttempts = 10;
-                options.Lockout.AllowedForNewUsers = false;
-
-                options.User.RequireUniqueEmail = true;
-            });
 
             services.ConfigureApplicationCookie(options =>
             {
@@ -80,7 +79,7 @@ namespace MyOnlineShop
             });
 
             services.AddRazorPages();
-            services.AddControllersWithViews(options => 
+            services.AddControllersWithViews(options =>
             {
                 options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
             })
@@ -89,20 +88,12 @@ namespace MyOnlineShop
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 });
 
-            services.AddAutoMapper(
-                typeof(AdminProductsProfile),
-                typeof(AdminCategoriesProfile));
-
-            // Services
-            services.AddTransient<IEmailSender, EmailSender>();
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<Customer> userManager, RoleManager<IdentityRole> roleManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var identityDataInitializer = new IdentityDataInitializer(userManager, roleManager);
-            identityDataInitializer.SeedData();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -123,8 +114,10 @@ namespace MyOnlineShop
 
             app.UseRouting();
 
-            app.UseAuthentication();
+            app.UseMiddleware<JwtCookieAuthenticationMiddleware>();
+
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {

@@ -1,7 +1,6 @@
-﻿using MyOnlineShop.Catalog.Data.Models.Products;
-using System;
+﻿using System;
 
-namespace MyOnlineShop.Catalog.Data.Models.ShoppingCarts
+namespace MyOnlineShop.Ordering.Data.Models.ShoppingCarts
 {
     public class ShoppingCartItem
     {
@@ -19,7 +18,12 @@ namespace MyOnlineShop.Catalog.Data.Models.ShoppingCarts
         public int Quantity { get; set; }
 
         public int ProductId { get; set; }
-        public Product Product { get; set; }
+
+        public string ProductName { get; set; }
+
+        public double ProductWeight { get; set; }
+
+        public decimal ProductPrice { get; set; }
 
         public string ShoppingCartId { get; set; }
         public ShoppingCart ShoppingCart { get; set; }

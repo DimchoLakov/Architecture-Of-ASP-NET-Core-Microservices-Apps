@@ -1,40 +1,44 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyOnlineShop.Common.Constants;
+using MyOnlineShop.Common.Services;
 using MyOnlineShop.WebMVC.Data.Models.Customers;
+using MyOnlineShop.WebMVC.Services.Identity;
 using MyOnlineShop.WebMVC.ViewModels.Identity;
+using System;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC.Controllers
 {
-    public class IdentityController : Controller
+    [AllowAnonymous]
+    public class IdentityController : HandleController
     {
-        private readonly SignInManager<Customer> signInManager;
-        private readonly UserManager<Customer> userManager;
-
+        private readonly IIdentityService identityService;
+        private readonly ICurrentUserService currentUserService;
+        private readonly IMapper mapper;
 
         public IdentityController(
-            SignInManager<Customer> signInManager,
-            UserManager<Customer> userManager)
+            IIdentityService identityService,
+            ICurrentUserService currentUserService,
+            IMapper mapper)
         {
-            this.signInManager = signInManager;
-            this.userManager = userManager;
+            this.identityService = identityService;
+            this.currentUserService = currentUserService;
+            this.mapper = mapper;
         }
 
         public async Task<IActionResult> Login(string returnUrl)
         {
             returnUrl ??= Url.Content("~/");
 
-            if (this.User.Identity.IsAuthenticated)
+            if (!string.IsNullOrWhiteSpace(currentUserService.UserId))
             {
                 return this.Redirect(returnUrl);
             }
 
-            await this.HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
-            var loginViewModel = new LoginViewModel();
-
-            return View(loginViewModel);
+            return await Task.Run(() => View(new LoginViewModel()));
         }
 
         [HttpPost]
@@ -42,27 +46,39 @@ namespace MyOnlineShop.WebMVC.Controllers
         {
             loginViewModel.ReturnUrl ??= Url.Content("~/");
 
-            if (this.ModelState.IsValid)
+            if (!this.ModelState.IsValid)
             {
-                var result = await this.signInManager
-                    .PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, lockoutOnFailure: false);
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
-                if (result.Succeeded)
-                {
-                    return LocalRedirect(loginViewModel.ReturnUrl);
-                }
+                return this.View(loginViewModel);
             }
 
-            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return await this.Handle(
+                async () =>
+                {
+                    var token = await this.identityService
+                                          .Login(this.mapper.Map<LoginViewModel, LoginCustomerInputModel>(loginViewModel));
 
-            return View(loginViewModel);
+                    this.Response
+                        .Cookies
+                        .Append(
+                                AuthConstants.AuthenticationCookieName,
+                                token,
+                                new CookieOptions
+                                {
+                                    HttpOnly = true,
+                                    Secure = true,
+                                    MaxAge = TimeSpan.FromDays(1)
+                                });
+
+                },
+                success: this.LocalRedirect("~/"),
+                failure: this.View(loginViewModel));
         }
 
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
-            var registerViewModel = new RegisterViewModel();
-
-            return this.View(registerViewModel);
+            return await Task.Run(() => this.View(new RegisterViewModel()));
         }
 
         [HttpPost]
@@ -70,36 +86,36 @@ namespace MyOnlineShop.WebMVC.Controllers
         {
             registerViewModel.ReturnUrl ??= Url.Content("~/");
 
-            if (ModelState.IsValid)
-            {
-                var user = new Customer
+            return await this.Handle(
+                async () =>
                 {
-                    UserName = registerViewModel.Email,
-                    Email = registerViewModel.Email,
-                    FirstName = registerViewModel.FirstName,
-                    LastName = registerViewModel.LastName
-                };
-                var result = await this.userManager.CreateAsync(user, registerViewModel.Password);
-                if (result.Succeeded)
-                {
-                    await this.signInManager.SignInAsync(user, isPersistent: false);
-                    return this.LocalRedirect(registerViewModel.ReturnUrl);
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
+                    var token = await this.identityService
+                         .Register(this.mapper.Map<RegisterViewModel, RegisterCustomerInputModel>(registerViewModel));
 
-            return this.View(registerViewModel);
+                    this.Response
+                        .Cookies
+                        .Append(
+                           AuthConstants.AuthenticationCookieName,
+                           token,
+                           new CookieOptions
+                           {
+                               HttpOnly = true,
+                               Secure = true,
+                               MaxAge = TimeSpan.FromDays(1)
+                           });
+                },
+                success: this.LocalRedirect(registerViewModel.ReturnUrl),
+                failure: this.View(registerViewModel));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Logout(string returnUrl = null)
+        public IActionResult Logout(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
 
-            await this.signInManager.SignOutAsync();
+            this.Response
+                .Cookies
+                .Delete("Authentication");
 
             return this.LocalRedirect(returnUrl);
         }
