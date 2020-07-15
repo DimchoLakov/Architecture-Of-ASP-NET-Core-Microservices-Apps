@@ -115,7 +115,7 @@ namespace MyOnlineShop.WebMVC.Controllers
 
             this.Response
                 .Cookies
-                .Delete("Authentication");
+                .Delete(AuthConstants.AuthenticationCookieName);
 
             return this.LocalRedirect(returnUrl);
         }
