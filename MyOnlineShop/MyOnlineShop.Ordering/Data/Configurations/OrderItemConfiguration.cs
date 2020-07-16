@@ -12,6 +12,14 @@ namespace MyOnlineShop.Ordering.Data.Configurations
                 .HasKey(x => x.Id);
 
             builder
+                .Property(x => x.Price)
+                .HasDefaultValueSql("decimal(16,2)");
+
+            builder
+                .Property(x => x.ProductPrice)
+                .HasDefaultValueSql("decimal(16,2)");
+
+            builder
                 .Property(x => x.ProductId)
                 .IsRequired();
 

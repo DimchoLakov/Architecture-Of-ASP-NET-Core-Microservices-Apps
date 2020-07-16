@@ -12,6 +12,7 @@ using MyOnlineShop.Common.Services;
 using MyOnlineShop.WebMVC.Data;
 using MyOnlineShop.WebMVC.Services;
 using MyOnlineShop.WebMVC.Services.Identity;
+using MyOnlineShop.WebMVC.Services.Images;
 using MyOnlineShop.WebMVC.Services.Ordering;
 using Newtonsoft.Json;
 using Refit;
@@ -64,6 +65,10 @@ namespace MyOnlineShop.WebMVC
             services
                 .AddRefitClient<IOrderingService>()
                 .WithConfiguration(serviceEndpoints.Ordering);
+
+            services
+             .AddRefitClient<IImageService>()
+             .WithConfiguration(serviceEndpoints.Catalog);
 
             services.AddRouting();
 

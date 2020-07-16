@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Categories
+namespace MyOnlineShop.Common.ViewModels.Categories
 {
     public class AddCategoryViewModel
     {

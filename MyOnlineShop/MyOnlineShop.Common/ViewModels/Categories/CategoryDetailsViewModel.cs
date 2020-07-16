@@ -1,7 +1,7 @@
-﻿using MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Products;
+﻿using MyOnlineShop.Common.ViewModels.Products;
 using System.Collections.Generic;
 
-namespace MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Categories
+namespace MyOnlineShop.Common.ViewModels.Categories
 {
     public class CategoryDetailsViewModel
     {

@@ -1,36 +1,37 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyOnlineShop.Catalog.Constants;
+using MyOnlineShop.Catalog.Data.Models.Categories;
+using MyOnlineShop.Common.Controllers;
 using MyOnlineShop.Common.ViewModels.Categories;
 using MyOnlineShop.Common.ViewModels.Products;
-using MyOnlineShop.WebMVC.Data;
-using MyOnlineShop.WebMVC.Data.Models.Categories;
+using MyOnlineShop.Ordering.Data;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using static MyOnlineShop.WebMVC.Constants.AdminConstants;
-
-namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
+namespace MyOnlineShop.Catalog.Controllers
 {
-    [Authorize(Roles = AdministratorRole)]
-    [Area(AdminArea)]
-    public class CategoriesController : Controller
+    public class CategoriesController : ApiController
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly CatalogDbContext dbContext;
         private readonly IMapper mapper;
 
-        public CategoriesController(ApplicationDbContext dbContext, IMapper mapper)
+        public CategoriesController(
+            CatalogDbContext dbContext, 
+            IMapper mapper)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<ActionResult<ICollection<CategoryIndexViewModel>>> Index()
         {
             var categoryIndexViewModels = await this.dbContext
                 .Categories
-                .Take(10)
+                .Take(CategoryConstants.MaxTake)
                 .Select(x => new CategoryIndexViewModel
                 {
                     Name = x.Name,
@@ -38,18 +39,11 @@ namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
                 })
                 .ToListAsync();
 
-            return View(categoryIndexViewModels);
-        }
-
-        public IActionResult Add()
-        {
-            var addCategoryViewModel = new AddCategoryViewModel();
-
-            return this.View(addCategoryViewModel);
+            return this.Ok(categoryIndexViewModels);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(AddCategoryViewModel addCategoryViewModel)
+        public async Task<ActionResult> Add(AddCategoryViewModel addCategoryViewModel)
         {
             if (this.ModelState.IsValid)
             {
@@ -59,7 +53,7 @@ namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
 
                 if (categoryExists)
                 {
-                    return BadRequest();
+                    return BadRequest(CategoryConstants.DoesAlreadyExistMessage);
                 }
 
                 var newCategory = this.mapper.Map<AddCategoryViewModel, Category>(addCategoryViewModel);
@@ -71,13 +65,20 @@ namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
                 await this.dbContext
                     .SaveChangesAsync();
 
-                return this.RedirectToAction(nameof(Index));
+                return this.Ok();
             }
 
-            return this.View(addCategoryViewModel);
+            var errors = this.ModelState
+                .SelectMany(x => x.Value.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+
+            return this.BadRequest(errors);
         }
 
-        public async Task<IActionResult> Details(int id)
+        [HttpGet]
+        [Route(Id)]
+        public async Task<ActionResult<CategoryDetailsViewModel>> Details(int id)
         {
             var categoryExists = await this.dbContext
                 .Categories
@@ -85,7 +86,7 @@ namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
 
             if (!categoryExists)
             {
-                return this.BadRequest();
+                return this.BadRequest(CategoryConstants.DoesNotExistMessage);
             }
 
             var categoryDetailsViewModel = await this.dbContext
@@ -121,15 +122,21 @@ namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
                 })
                 .FirstOrDefaultAsync();
 
-            return this.View(categoryDetailsViewModel);
+            return this.Ok(categoryDetailsViewModel);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> StatusChange(int id)
+        [HttpPut]
+        [Route(Id)]
+        public async Task<ActionResult> StatusChange(int id)
         {
             var category = await this.dbContext
                 .Categories
                 .FindAsync(id);
+
+            if (category == null)
+            {
+                return this.BadRequest(CategoryConstants.DoesNotExistMessage);
+            }
 
             category.IsActive = !category.IsActive;
 
@@ -137,13 +144,10 @@ namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
                 .Categories
                 .Update(category);
 
-            var rowsAffected = await this.dbContext
+            await this.dbContext
                 .SaveChangesAsync();
 
-            return this.Json(new
-            {
-                updated = rowsAffected == 1
-            });
+            return this.Ok();
         }
     }
 }

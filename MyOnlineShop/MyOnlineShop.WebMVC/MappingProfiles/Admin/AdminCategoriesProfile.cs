@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Categories;
+using MyOnlineShop.Common.ViewModels.Categories;
 using MyOnlineShop.WebMVC.Data.Models.Categories;
 
 namespace MyOnlineShop.WebMVC.MappingProfiles.Admin

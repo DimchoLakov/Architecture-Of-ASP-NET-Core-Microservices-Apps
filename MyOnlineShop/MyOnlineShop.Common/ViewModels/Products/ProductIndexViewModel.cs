@@ -1,4 +1,4 @@
-﻿namespace MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Products
+﻿namespace MyOnlineShop.Common.ViewModels.Products
 {
     public class ProductIndexViewModel
     {

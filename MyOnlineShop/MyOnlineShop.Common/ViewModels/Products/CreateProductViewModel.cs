@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Products
+namespace MyOnlineShop.Common.ViewModels.Products
 {
     public class CreateProductViewModel
     {

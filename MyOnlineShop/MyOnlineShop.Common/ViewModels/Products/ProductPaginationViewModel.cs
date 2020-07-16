@@ -1,7 +1,7 @@
-﻿using MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Pagination;
+﻿using MyOnlineShop.Common.ViewModels.Pagination;
 using System.Collections.Generic;
 
-namespace MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Products
+namespace MyOnlineShop.Common.ViewModels.Products
 {
     public class ProductPaginationViewModel
     {

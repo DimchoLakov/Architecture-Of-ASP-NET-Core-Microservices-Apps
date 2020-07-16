@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
-namespace MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Images
+namespace MyOnlineShop.Common.ViewModels.Images
 {
     public class AddImageViewModel
     {

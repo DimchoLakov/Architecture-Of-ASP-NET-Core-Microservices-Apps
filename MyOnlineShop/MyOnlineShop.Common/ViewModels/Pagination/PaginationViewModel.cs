@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Pagination
+namespace MyOnlineShop.Common.ViewModels.Pagination
 {
     public class PaginationViewModel
     {

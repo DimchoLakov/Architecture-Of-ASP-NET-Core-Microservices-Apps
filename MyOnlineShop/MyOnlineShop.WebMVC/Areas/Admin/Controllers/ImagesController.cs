@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyOnlineShop.WebMVC.Areas.Admin.ViewModels.Images;
+using MyOnlineShop.Common.ViewModels.Images;
 using MyOnlineShop.WebMVC.Data;
 using MyOnlineShop.WebMVC.Data.Models.Galleries;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
+using static MyOnlineShop.WebMVC.Constants.AdminConstants;
 using static MyOnlineShop.WebMVC.Constants.ImageConstants;
 using static MyOnlineShop.WebMVC.Constants.ProductConstants;
-using static MyOnlineShop.WebMVC.Constants.AdminConstants;
 
 namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
 {
