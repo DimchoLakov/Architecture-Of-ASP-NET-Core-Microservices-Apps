@@ -1,32 +1,39 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MyOnlineShop.WebMVC.Data;
+using MyOnlineShop.WebMVC.Constants;
+using MyOnlineShop.WebMVC.Services.Catalog;
+using System;
 using System.Threading.Tasks;
-using static MyOnlineShop.WebMVC.Constants.ImageConstants;
 
 namespace MyOnlineShop.WebMVC.Controllers
 {
     public class ImagesController : Controller
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly ICatalogService catalogService;
 
-        public ImagesController(ApplicationDbContext dbContext)
+        public ImagesController(ICatalogService catalogService)
         {
-            this.dbContext = dbContext;
+            this.catalogService = catalogService;
         }
 
         public async Task<IActionResult> Get(int id)
         {
-            var image = await this.dbContext
-                .Images
-                .FindAsync(id);
-
-            if (image == null)
+            try
             {
-                return this.BadRequest(ImageDoesNotExistMessage);
+                var imageViewModel = await this.catalogService.GetImage(id);
+
+                return new FileContentResult(imageViewModel.Content, imageViewModel.ContentType);
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
             }
 
-            return new FileContentResult(image.Content, $"image/{image.MimeType}");
+            return this.BadRequest(ImageConstants.ImageDoesNotExistMessage);
         }
 
+        private void HandleException(Exception ex)
+        {
+            ViewBag.CatalogInoperativeMsg = $"Catalog Service is inoperative {ex.GetType().Name} - {ex.Message}";
+        }
     }
 }

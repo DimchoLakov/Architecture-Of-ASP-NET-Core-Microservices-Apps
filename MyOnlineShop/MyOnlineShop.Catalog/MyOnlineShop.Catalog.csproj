@@ -5,8 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Migrations\20200717011649_InitialTablesCreate.cs" />
+    <Compile Remove="Data\Migrations\20200717011649_InitialTablesCreate.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200717011822_InitialTablesCreate.cs" />
+    <Compile Remove="Data\Migrations\20200717011822_InitialTablesCreate.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6" />
   </ItemGroup>
 
   <ItemGroup>

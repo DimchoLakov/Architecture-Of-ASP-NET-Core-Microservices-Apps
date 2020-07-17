@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using MyOnlineShop.Catalog.Data.Models.Categories;
+using MyOnlineShop.Catalog.Data.Models.Customers;
 using MyOnlineShop.Catalog.Data.Models.Galleries;
 using MyOnlineShop.Catalog.Data.Models.Products;
+using MyOnlineShop.Common.ViewModels.Addresses;
 using MyOnlineShop.Common.ViewModels.Categories;
 using MyOnlineShop.Common.ViewModels.Products;
 using System;
@@ -29,6 +31,24 @@ namespace MyOnlineShop.Catalog.Profiles
                 .ReverseMap();
 
             this.CreateMap<AddCategoryViewModel, Category>();
+
+            this.CreateMap<Address, AddressViewModel>();
+
+            this.CreateMap<AddCategoryViewModel, Category>();
+
+            this.CreateMap<Product, ProductIndexViewModel>();
+
+            this.CreateMap<Image, ProductImageViewModel>();
+
+            this.CreateMap<CreateProductViewModel, Product>()
+                .ForMember(dest => dest.ProductCategories, opts => opts.Ignore())
+                .ForMember(dest => dest.DateAdded, opts => opts.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.LastUpdated, opts => opts.MapFrom(src => DateTime.UtcNow));
+
+            this.CreateMap<EditProductViewModel, Product>()
+                .ForMember(dest => dest.ProductCategories, opts => opts.Ignore())
+                .ForMember(dest => dest.DateAdded, opts => opts.Ignore())
+                .ForMember(dest => dest.LastUpdated, opts => opts.MapFrom(src => DateTime.UtcNow));
         }
     }
 }

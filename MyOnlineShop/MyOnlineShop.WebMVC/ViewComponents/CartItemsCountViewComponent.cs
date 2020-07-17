@@ -1,40 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MyOnlineShop.WebMVC.Data;
-using MyOnlineShop.WebMVC.Data.Models.ShoppingCarts;
-using MyOnlineShop.WebMVC.Helpers;
-using System.Linq;
+using MyOnlineShop.Common.Services;
+using MyOnlineShop.WebMVC.Services.ShoppingCart;
+using System;
 using System.Threading.Tasks;
-using static MyOnlineShop.WebMVC.Constants.ShoppingCartConstants;
 
 namespace MyOnlineShop.WebMVC.ViewComponents
 {
     public class CartItemsCountViewComponent : ViewComponent
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly IShoppingCartService shoppingCartService;
+        private readonly ICurrentUserService currentUserService;
 
-        public CartItemsCountViewComponent(ApplicationDbContext dbContext)
+        public CartItemsCountViewComponent(
+            IShoppingCartService shoppingCartService,
+            ICurrentUserService currentUserService)
         {
-            this.dbContext = dbContext;
+            this.shoppingCartService = shoppingCartService;
+            this.currentUserService = currentUserService;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            int cartItemsCount = 0;
-            var session = this.HttpContext.Session;
-            if (session.IsAvailable)
+            try
             {
-                var shoppingCart = session.GetObjectFromJson<ShoppingCart>(CartName);
-                if (shoppingCart != null)
-                {
-                    cartItemsCount = shoppingCart
-                        .CartItems
-                        .Select(x => x.Quantity)
-                        .DefaultIfEmpty(0)
-                        .Sum();
-                }
-            }
+                var cartItemsCount = await this.shoppingCartService.GetCartItemsCount(this.currentUserService.UserId);
 
-            return await Task.Run(() => this.View(cartItemsCount));
+                ViewBag.IsCartInoperative = false;
+
+                return this.View(cartItemsCount);
+            }
+            catch(Exception e)
+            {
+                ViewBag.IsCartInoperative = true;
+
+                return this.View(0);
+            }
         }
     }
 }

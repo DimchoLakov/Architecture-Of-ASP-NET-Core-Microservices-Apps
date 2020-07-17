@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Ordering.Data.Models.Orders;
-using MyOnlineShop.Ordering.Data.Models.ShoppingCarts;
 using System.Reflection;
 
 namespace MyOnlineShop.Ordering.Data
@@ -15,10 +14,6 @@ namespace MyOnlineShop.Ordering.Data
         public DbSet<Order> Orders { get; set; }
 
         public DbSet<OrderItem> OrderItems { get; set; }
-
-        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
-
-        public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

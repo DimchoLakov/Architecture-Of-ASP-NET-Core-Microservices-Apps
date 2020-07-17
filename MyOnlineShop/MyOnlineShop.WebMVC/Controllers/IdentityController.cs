@@ -4,16 +4,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.Services;
-using MyOnlineShop.WebMVC.Data.Models.Customers;
 using MyOnlineShop.WebMVC.Services.Identity;
 using MyOnlineShop.WebMVC.ViewModels.Identity;
+using Newtonsoft.Json;
+using Refit;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC.Controllers
 {
     [AllowAnonymous]
-    public class IdentityController : HandleController
+    public class IdentityController : Controller
     {
         private readonly IIdentityService identityService;
         private readonly ICurrentUserService currentUserService;
@@ -53,13 +55,12 @@ namespace MyOnlineShop.WebMVC.Controllers
                 return this.View(loginViewModel);
             }
 
-            return await this.Handle(
-                async () =>
-                {
-                    var token = await this.identityService
+            try
+            {
+                var token = await this.identityService
                                           .Login(this.mapper.Map<LoginViewModel, LoginCustomerInputModel>(loginViewModel));
 
-                    this.Response
+                this.Response
                         .Cookies
                         .Append(
                                 AuthConstants.AuthenticationCookieName,
@@ -71,9 +72,27 @@ namespace MyOnlineShop.WebMVC.Controllers
                                     MaxAge = TimeSpan.FromDays(1)
                                 });
 
-                },
-                success: this.LocalRedirect("~/"),
-                failure: this.View(loginViewModel));
+                return this.LocalRedirect(loginViewModel.ReturnUrl);
+            }
+            catch (ApiException apiEx)
+            {
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, "Internal server error.");
+                }
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
+
+            return this.View(loginViewModel);
         }
 
         public async Task<IActionResult> Register()
@@ -86,13 +105,12 @@ namespace MyOnlineShop.WebMVC.Controllers
         {
             registerViewModel.ReturnUrl ??= Url.Content("~/");
 
-            return await this.Handle(
-                async () =>
-                {
-                    var token = await this.identityService
+            try
+            {
+                var token = await this.identityService
                          .Register(this.mapper.Map<RegisterViewModel, RegisterCustomerInputModel>(registerViewModel));
 
-                    this.Response
+                this.Response
                         .Cookies
                         .Append(
                            AuthConstants.AuthenticationCookieName,
@@ -103,9 +121,28 @@ namespace MyOnlineShop.WebMVC.Controllers
                                Secure = true,
                                MaxAge = TimeSpan.FromDays(1)
                            });
-                },
-                success: this.LocalRedirect(registerViewModel.ReturnUrl),
-                failure: this.View(registerViewModel));
+
+                return this.LocalRedirect(registerViewModel.ReturnUrl);
+            }
+            catch (ApiException apiEx)
+            {
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, "Internal server error.");
+                }
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
+
+            return this.View(registerViewModel);
         }
 
         [HttpPost]
@@ -118,6 +155,11 @@ namespace MyOnlineShop.WebMVC.Controllers
                 .Delete(AuthConstants.AuthenticationCookieName);
 
             return this.LocalRedirect(returnUrl);
+        }
+
+        private void HandleException(Exception ex)
+        {
+            ViewBag.IdentityServiceInoperativeMsg = $"Identity Service is inoperative {ex.GetType().Name} - {ex.Message}";
         }
     }
 }

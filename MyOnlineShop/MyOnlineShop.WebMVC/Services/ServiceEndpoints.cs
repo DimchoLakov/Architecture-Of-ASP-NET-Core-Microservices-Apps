@@ -7,5 +7,7 @@
         public string Catalog { get; set; }
 
         public string Ordering { get; set; }
+
+        public string ShoppingCart { get; set; }
     }
 }

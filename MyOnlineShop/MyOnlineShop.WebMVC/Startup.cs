@@ -3,20 +3,20 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyOnlineShop.Common.Infrastructure;
 using MyOnlineShop.Common.Services;
-using MyOnlineShop.WebMVC.Data;
 using MyOnlineShop.WebMVC.Services;
+using MyOnlineShop.WebMVC.Services.Catalog;
 using MyOnlineShop.WebMVC.Services.Identity;
-using MyOnlineShop.WebMVC.Services.Images;
 using MyOnlineShop.WebMVC.Services.Ordering;
+using MyOnlineShop.WebMVC.Services.ShoppingCart;
 using Newtonsoft.Json;
 using Refit;
 using System;
+using System.Net;
 using System.Reflection;
 
 namespace MyOnlineShop.WebMVC
@@ -35,11 +35,6 @@ namespace MyOnlineShop.WebMVC
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
-            services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
             services.AddSession(options =>
@@ -67,7 +62,11 @@ namespace MyOnlineShop.WebMVC
                 .WithConfiguration(serviceEndpoints.Ordering);
 
             services
-             .AddRefitClient<IImageService>()
+                .AddRefitClient<IShoppingCartService>()
+                .WithConfiguration(serviceEndpoints.ShoppingCart);
+
+            services
+             .AddRefitClient<ICatalogService>()
              .WithConfiguration(serviceEndpoints.Catalog);
 
             services.AddRouting();
@@ -77,8 +76,8 @@ namespace MyOnlineShop.WebMVC
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/Identity/Account/Login";
-                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.LoginPath = "/Identity/Login";
+                options.AccessDeniedPath = "/Identity/AccessDenied";
             });
 
             services.AddRazorPages();
@@ -109,7 +108,19 @@ namespace MyOnlineShop.WebMVC
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            app.UseStatusCodePagesWithReExecute("/Home/Error/", "?/StatusCode={0}");
+
+            app.UseStatusCodePages(async context =>
+            {
+                var request = context.HttpContext.Request;
+                var response = context.HttpContext.Response;
+
+                if (response.StatusCode == (int)HttpStatusCode.Unauthorized)
+                {
+                    response.Redirect("/Identity/Login");
+                }
+            });
+
+            //app.UseStatusCodePagesWithReExecute("/Home/Error/", "?/StatusCode={0}");
 
             app.UseSession();
 

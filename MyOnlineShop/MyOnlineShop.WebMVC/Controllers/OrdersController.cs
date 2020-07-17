@@ -1,93 +1,61 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MyOnlineShop.WebMVC.Data;
-using MyOnlineShop.WebMVC.ViewModels.Orders;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MyOnlineShop.Common.Services;
+using MyOnlineShop.WebMVC.Services.Ordering;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-
-using static MyOnlineShop.WebMVC.Constants.DateTimeConstants;
-using static MyOnlineShop.WebMVC.Constants.OrderConstants;
 
 namespace MyOnlineShop.WebMVC.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly IOrderingService orderingService;
+        private readonly ICurrentUserService currentUserService;
 
-        public OrdersController(ApplicationDbContext dbContext)
+        public OrdersController(
+            IOrderingService orderingService,
+            ICurrentUserService currentUserService)
         {
-            this.dbContext = dbContext;
+            this.orderingService = orderingService;
+            this.currentUserService = currentUserService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var orderIndexViewModels = await this.dbContext
-                .Orders
-                .Select(x => new OrderIndexViewModel
-                {
-                    Id = x.Id,
-                    Date = x.Date.ToString(DateFullMonthYearFormat),
-                    Orders = string.Join(", ", x
-                                               .OrderItems
-                                               .Select(oi => oi.Product.Name + " x " + oi.Quantity)
-                                               .ToList())
-                })
-                .ToListAsync();
+            try
+            {
+                var orderIndexViewModels = await this.orderingService.GetUserOrders(this.currentUserService.UserId);
 
-            return View(orderIndexViewModels);
+                return this.View(orderIndexViewModels);
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
+
+            return this.View();
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var orderExists = await this.dbContext
-                .Orders
-                .AnyAsync(x => x.Id == id);
-
-            if (!orderExists)
+            try
             {
-                throw new ArgumentException(OrderDoesNotExistMessage);
+                var orderDetailsViewModel = await this.orderingService.Details(id);
+
+                return this.View(orderDetailsViewModel);
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
             }
 
-            var orderDetailsViewModel = await this.dbContext
-                .Orders
-                .Where(x => x.Id == id)
-                .Select(x => new OrderDetailsViewModel
-                {
-                    Date = x.Date.ToString(DateFullMonthYearHoursMinutesFormat),
-                    DeliveryCost = x.DeliveryCost,
-                    OrderItemDetailsViewModels = x
-                                                  .OrderItems
-                                                  .Select(oi => new OrderItemDetailsViewModel 
-                                                  {
-                                                      PrimaryImageId = oi
-                                                                         .Product
-                                                                         .Images
-                                                                         .Where(i => i.IsPrimary)
-                                                                         .Select(i => i.Id)
-                                                                         .FirstOrDefault(),
-                                                      PrimaryImageName = oi
-                                                                         .Product
-                                                                         .Images
-                                                                         .Where(i => i.IsPrimary)
-                                                                         .Select(i => i.Name)
-                                                                         .FirstOrDefault(),
-                                                      ProductDescription = oi
-                                                                             .Product
-                                                                             .Description,
-                                                      ProductName = oi
-                                                                      .Product
-                                                                      .Name,
-                                                      ProductPrice = oi
-                                                                       .Product
-                                                                       .Price,
-                                                      Quantity = oi.Quantity
-                                                  })
-                                                  .ToList()
-                })
-                .FirstOrDefaultAsync();
+            return this.View();
+        }
 
-            return this.View(orderDetailsViewModel);
+        private void HandleException(Exception ex)
+        {
+            ViewBag.OrderingInoperativeMsg = $"Ordering Service is inoperative {ex.GetType().Name} - {ex.Message}";
         }
     }
 }

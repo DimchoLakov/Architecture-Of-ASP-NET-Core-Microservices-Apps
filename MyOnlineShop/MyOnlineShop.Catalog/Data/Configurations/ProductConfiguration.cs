@@ -17,7 +17,7 @@ namespace MyOnlineShop.Catalog.Data.Configurations
 
             builder
                 .Property(x => x.Price)
-                .HasDefaultValueSql("decimal(16,2)");
+                .HasColumnType("decimal(16,2)");
 
             builder
                 .Property(x => x.Description)

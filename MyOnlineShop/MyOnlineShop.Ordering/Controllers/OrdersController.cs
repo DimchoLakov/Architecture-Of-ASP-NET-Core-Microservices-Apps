@@ -51,7 +51,7 @@ namespace MyOnlineShop.Ordering.Controllers
 
         [Authorize]
         [HttpGet(Id)]
-        public async Task<ActionResult> Details(int id)
+        public async Task<ActionResult<OrderDetailsViewModel>> Details(int id)
         {
             var orderExists = await this.dbContext
                 .Orders

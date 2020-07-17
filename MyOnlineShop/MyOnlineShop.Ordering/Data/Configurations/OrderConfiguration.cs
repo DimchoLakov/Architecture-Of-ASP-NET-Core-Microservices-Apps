@@ -12,6 +12,10 @@ namespace MyOnlineShop.Ordering.Data.Configurations
                 .HasKey(x => x.Id);
 
             builder
+                .Property(x => x.DeliveryCost)
+                .HasColumnType("decimal(16,2)");
+
+            builder
                 .HasMany(x => x.OrderItems)
                 .WithOne(x => x.Order)
                 .HasForeignKey(x => x.OrderId)

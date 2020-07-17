@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyOnlineShop.Catalog.Data.Configurations;
 using MyOnlineShop.Catalog.Data.Models.Categories;
 using MyOnlineShop.Catalog.Data.Models.Customers;
 using MyOnlineShop.Catalog.Data.Models.Galleries;

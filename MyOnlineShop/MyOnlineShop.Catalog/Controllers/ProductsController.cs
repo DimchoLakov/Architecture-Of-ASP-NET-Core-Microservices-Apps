@@ -11,7 +11,6 @@ using MyOnlineShop.Common.ViewModels.Pagination;
 using MyOnlineShop.Common.ViewModels.Products;
 using MyOnlineShop.Ordering.Data;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,7 +23,7 @@ namespace MyOnlineShop.Catalog.Controllers
         private readonly IMapper mapper;
 
         public ProductsController(
-            CatalogDbContext dbContext, 
+            CatalogDbContext dbContext,
             IMapper mapper)
         {
             this.dbContext = dbContext;
@@ -32,7 +31,7 @@ namespace MyOnlineShop.Catalog.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<ProductPaginationViewModel>>> All([FromQuery]int? currentPage = 1, [FromQuery]string search = null)
+        public async Task<ActionResult<ProductPaginationViewModel>> All([FromQuery] int? currentPage = 1, [FromQuery] string search = null)
         {
             int count = 0;
 
@@ -113,7 +112,7 @@ namespace MyOnlineShop.Catalog.Controllers
 
         [HttpGet]
         [Route(Id)]
-        public async Task<ActionResult<ProductDetailsViewModel>> Details(int id, [FromQuery]int? fromPage = 1)
+        public async Task<ActionResult<ProductDetailsViewModel>> Details([FromQuery] int id, [FromQuery] int? fromPage = 1)
         {
             var productExists = await this.dbContext
                 .Products
@@ -265,6 +264,61 @@ namespace MyOnlineShop.Catalog.Controllers
                 .ToList();
 
             return this.BadRequest(errors);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<ActionResult<EditProductViewModel>> GetEdit(int id, int? fromPage = 1)
+        {
+            var productExists = await this.dbContext
+               .Products
+               .AnyAsync(x => x.Id == id);
+
+            if (!productExists)
+            {
+                return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
+            }
+
+            var editProductViewModel = await this.dbContext
+                .Products
+                .Where(x => x.Id == id)
+                .Select(x => new EditProductViewModel
+                {
+                    Id = x.Id,
+                    Description = x.Description,
+                    Name = x.Name,
+                    Price = x.Price,
+                    StockAvailable = x.StockAvailable,
+                    Weight = x.Weight,
+                    DateAdded = x.DateAdded,
+                    LastUpdated = x.LastUpdated,
+                    IsArchived = x.IsArchived,
+                    FromPageNumber = fromPage.Value,
+                    PrimaryImageViewModel = new ProductImageViewModel
+                    {
+                        Id = x
+                              .Images
+                              .Where(i => i.IsPrimary)
+                              .Select(i => i.Id)
+                              .FirstOrDefault(),
+                        Name = x
+                              .Images
+                              .Where(i => i.IsPrimary)
+                              .Select(i => i.Name)
+                              .FirstOrDefault()
+                    },
+                    ImageViewModels = x
+                        .Images
+                        .Select(i => new ProductImageViewModel
+                        {
+                            Id = i.Id,
+                            Name = i.Name
+                        })
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            return this.Ok(editProductViewModel);
         }
 
         [HttpPut]

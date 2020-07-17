@@ -1,4 +1,4 @@
-﻿@model ShoppingCartOrderAddressViewModel
+﻿@model ShoppingCartOrderWrapperViewModel
 
 @{
     ViewData["Title"] = "Checkout";
@@ -6,14 +6,14 @@
 
 <div class="row">
     <div class="col-md-12">
-        @foreach (var cartItem in Model.ShoppingCartIndexViewModel.CartItemViewModels)
+        @foreach (var cartItem in Model.ShoppingCartViewModel.CartItemViewModels)
         {
             <div class="cart-item mb-2 d-md-inline-block">
                 <p>@cartItem.ProductName</p>
                 <p>$@cartItem.ProductPrice x @cartItem.Quantity = $@(cartItem.Total)</p>
             </div>
         }
-        <p><b>Total:</b> $@Model.ShoppingCartIndexViewModel.Total</p>
+        <p><b>Total:</b> $@Model.ShoppingCartViewModel.Total</p>
         @if (!Model.OrderAddressViewModel.IsAddressAvailable)
         {
             <form method="post" asp-area="" asp-controller="ShoppingCarts" asp-action="Checkout" class="mb-2">

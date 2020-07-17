@@ -1,2 +1,2 @@
 ﻿@model int
-@Model
+@((bool)ViewBag.IsCartInoperative ? "Cart Inoperative" : Model.ToString())
