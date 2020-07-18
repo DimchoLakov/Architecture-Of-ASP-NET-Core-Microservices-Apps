@@ -1,0 +1,55 @@
+﻿@model CreateProductViewModel
+
+@{
+    ViewData["Title"] = "Create New Product";
+}
+<h2 class="text-danger">Admin</h2>
+
+<form method="post" enctype="multipart/form-data" asp-area="Admin" asp-controller="Products" asp-action="Create">
+    <div class="form-row">
+        <div class="form-group col-md-5">
+            <label asp-for="Name" required></label>
+            <input asp-for="Name" class="form-control" required>
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-3">
+            <label asp-for="Price"></label>
+            <input asp-for="Price" type="number" step="0.01" class="form-control" required>
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label asp-for="Weight"></label>
+            <input asp-for="Weight" type="number" step="0.01" class="form-control" required>
+            <span asp-validation-for="Weight" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label asp-for="StockAvailable"></label>
+            <input asp-for="StockAvailable" type="number" class="form-control" required>
+            <span asp-validation-for="StockAvailable" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-5">
+            <label asp-for="CategoryId"></label>
+            <select asp-for="CategoryId" asp-items="Model.Categories" class="form-control"></select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" class="form-control" rows="10" required></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="ImageUrl"></label>
+            <input asp-for="ImageUrl" class="form-control">
+            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success">Create</button>
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

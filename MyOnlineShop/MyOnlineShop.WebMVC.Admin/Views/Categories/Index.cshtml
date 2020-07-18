@@ -1,0 +1,49 @@
+﻿@model IEnumerable<CategoryIndexViewModel>
+
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+<h2 class="text-danger">Admin</h2>
+
+@if (!string.IsNullOrWhiteSpace(ViewBag.CatalogInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.CatalogInoperativeMsg</p>
+}
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        @if (!Model.Any())
+        {
+            <p class="bg-warning d-inline-block p-1">No categories added yet.</p>
+        }
+        <form method="post" asp-area="Admin" asp-controller="Categories" asp-action="Add">
+            <div class="input-group">
+                <label for="Name" class="col-form-label mr-2">Add new category</label>
+                <input type="text" name="Name" value="" id="Name" class="form-control" placeholder="e.g. Cars" />
+                <button type="submit" class="btn btn-success">Add</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-12">
+        <div class="categories">
+            @foreach (var categoryIndexViewModel in Model)
+            {
+                <div class="category">
+                    <p>@categoryIndexViewModel.Name</p>
+
+                    <form method="post" asp-area="Admin" asp-controller="Categories" asp-action="StatusChange" class="p-2">
+                        <input name="Id" value="@categoryIndexViewModel.Id" id="Id" type="hidden" />
+                        @if (categoryIndexViewModel.IsActive)
+                        {
+                            <button type="submit" class="btn btn-danger w-100">Make Inactive</button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-success w-100">Make Active</button>
+                        }
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+</div>

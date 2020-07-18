@@ -1,26 +1,24 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyOnlineShop.Common.Infrastructure;
 using MyOnlineShop.Common.Services;
-using MyOnlineShop.WebMVC.Services;
-using MyOnlineShop.WebMVC.Services.Catalog;
-using MyOnlineShop.WebMVC.Services.Identity;
-using MyOnlineShop.WebMVC.Services.Ordering;
-using MyOnlineShop.WebMVC.Services.ShoppingCart;
+using MyOnlineShop.WebMVC.Admin.Services;
+using MyOnlineShop.WebMVC.Admin.Services.Catalog;
+using MyOnlineShop.WebMVC.Admin.Services.Identity;
+using MyOnlineShop.WebMVC.Admin.Services.Ordering;
+using MyOnlineShop.WebMVC.Admin.Services.ShoppingCart;
 using Newtonsoft.Json;
 using Refit;
-using System;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace MyOnlineShop.WebMVC
+namespace MyOnlineShop.WebMVC.Admin
 {
     public class Startup
     {
@@ -108,8 +106,6 @@ namespace MyOnlineShop.WebMVC
                         name: "default",
                         pattern: "{controller=Products}/{action=Index}/{id?}");
                 });
-
-            //app.UseStatusCodePagesWithReExecute("/Home/Error/", "?/StatusCode={0}");
         }
     }
 }

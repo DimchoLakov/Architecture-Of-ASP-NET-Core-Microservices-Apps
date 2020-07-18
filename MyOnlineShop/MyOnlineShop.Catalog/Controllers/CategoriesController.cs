@@ -18,14 +18,10 @@ namespace MyOnlineShop.Catalog.Controllers
     public class CategoriesController : ApiController
     {
         private readonly CatalogDbContext dbContext;
-        private readonly IMapper mapper;
 
-        public CategoriesController(
-            CatalogDbContext dbContext, 
-            IMapper mapper)
+        public CategoriesController(CatalogDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.mapper = mapper;
         }
 
         [HttpGet]

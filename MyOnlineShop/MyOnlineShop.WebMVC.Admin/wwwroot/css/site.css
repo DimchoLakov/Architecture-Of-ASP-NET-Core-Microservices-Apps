@@ -1,0 +1,158 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+}
+
+/* Provide sufficient contrast against white background */
+a {
+    color: #0366d6;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.border-top {
+    border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+    background-color: #D1D1D1;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px; /* Vertically center the text there */
+}
+
+.card-img-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-img-wrapper img {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    max-width: 100%;
+    height: auto;
+    transform: translate(-50%, -25%);
+}
+
+.card-img-wrapper::after {
+    display: block;
+    content: '';
+    padding-top: 56.25%;
+}
+
+.product-image,
+.media {
+    overflow: hidden;
+    border-radius: 0.5rem;
+    position: relative;
+}
+
+.media {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border: 1px solid black;
+}
+
+.product-image::before,
+.media::after {
+    display: block;
+    content: '';
+    padding-top: 56.25%;
+}
+
+.product-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.media img {
+    display: block;
+    width: 100%;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.categories {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.category {
+    margin-right: 2em;
+}
+
+.cart-item,
+.order-item,
+.category {
+    border: 1px solid black;
+    border-radius: 0.2rem;
+    padding: 0.5rem 0.5rem 0 0.5rem;
+    margin-bottom: 1em;
+}
+
+.no-top-border {
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
