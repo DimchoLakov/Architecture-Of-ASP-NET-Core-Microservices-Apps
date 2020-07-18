@@ -47,20 +47,24 @@ namespace MyOnlineShop.Catalog.Controllers
 
         [HttpPost]
         [Authorize(Roles = AdminConstants.AdministratorRole)]
-        public async Task<ActionResult> Add(AddCategoryViewModel addCategoryViewModel)
+        public async Task<ActionResult> Add(string name)
         {
-            if (this.ModelState.IsValid)
+            if (!string.IsNullOrWhiteSpace(name))
             {
                 var categoryExists = await this.dbContext
                     .Categories
-                    .AnyAsync(x => x.Name.ToLower().Contains(addCategoryViewModel.Name.ToLower()));
+                    .AnyAsync(x => x.Name.ToLower().Contains(name));
 
                 if (categoryExists)
                 {
-                    return BadRequest(CategoryConstants.DoesAlreadyExistMessage);
+                    return BadRequest(CategoryConstants.CategoryAlreadyExistsMessage);
                 }
 
-                var newCategory = this.mapper.Map<AddCategoryViewModel, Category>(addCategoryViewModel);
+                var newCategory = new Category
+                {
+                    Name = name,
+                    IsActive = true
+                };
 
                 await this.dbContext
                     .Categories
@@ -72,12 +76,7 @@ namespace MyOnlineShop.Catalog.Controllers
                 return this.Ok();
             }
 
-            var errors = this.ModelState
-                .SelectMany(x => x.Value.Errors)
-                .Select(x => x.ErrorMessage)
-                .ToList();
-
-            return this.BadRequest(errors);
+            return this.BadRequest(CategoryConstants.InvalidCategoryNameMessage);
         }
 
         [HttpGet]
@@ -90,7 +89,7 @@ namespace MyOnlineShop.Catalog.Controllers
 
             if (!categoryExists)
             {
-                return this.BadRequest(CategoryConstants.DoesNotExistMessage);
+                return this.BadRequest(CategoryConstants.CategoryDoesNotExistMessage);
             }
 
             var categoryDetailsViewModel = await this.dbContext
@@ -126,7 +125,7 @@ namespace MyOnlineShop.Catalog.Controllers
 
             if (category == null)
             {
-                return this.BadRequest(CategoryConstants.DoesNotExistMessage);
+                return this.BadRequest(CategoryConstants.CategoryDoesNotExistMessage);
             }
 
             category.IsActive = !category.IsActive;

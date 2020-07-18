@@ -18,7 +18,8 @@ namespace MyOnlineShop.WebMVC.MappingProfiles
                 .ForMember(dest => dest.ProductPrice, options => options.MapFrom(src => src.Price))
                 .ForMember(dest => dest.ProductWeight, options => options.MapFrom(src => src.Weight))
                 .ForMember(dest => dest.ProductImageUrl, options => options.MapFrom(src => src.ImageUrl))
-                .ForMember(dest => dest.Quantity, options => options.Ignore())
+                .ForMember(dest => dest.ProductDescription, options => options.MapFrom(src => src.Description))
+                .ForMember(dest => dest.Quantity, options => options.MapFrom(src => 1))
                 .ForMember(dest => dest.Total, options => options.Ignore());
         }
     }

@@ -5,6 +5,7 @@ using MyOnlineShop.Catalog.Data.Models.Products;
 using MyOnlineShop.Common.ViewModels.Addresses;
 using MyOnlineShop.Common.ViewModels.Categories;
 using MyOnlineShop.Common.ViewModels.Products;
+using MyOnlineShop.Common.ViewModels.ShoppingCarts;
 using System;
 
 namespace MyOnlineShop.Catalog.Profiles
@@ -44,6 +45,10 @@ namespace MyOnlineShop.Catalog.Profiles
                 .ForMember(dest => dest.ProductCategories, opts => opts.Ignore())
                 .ForMember(dest => dest.DateAdded, opts => opts.Ignore())
                 .ForMember(dest => dest.LastUpdated, opts => opts.MapFrom(src => DateTime.UtcNow));
+
+            this.CreateMap<OrderAddressViewModel, Address>()
+                .ForMember(dest => dest.IsDeliveryAddress, opts => opts.Ignore())
+                .ReverseMap();
         }
     }
 }

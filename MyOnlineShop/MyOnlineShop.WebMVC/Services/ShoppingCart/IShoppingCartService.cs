@@ -13,7 +13,7 @@ namespace MyOnlineShop.WebMVC.Services.ShoppingCart
         Task<ShoppingCartViewModel> GetShoppingCart(string userId);
 
         [Post("/ShoppingCart")]
-        Task AddToCart([Body] CartItemViewModel cartItemViewModel);
+        Task AddToCart([Query] string userId, [Body] CartItemViewModel cartItemViewModel);
 
         [Post("/ShoppingCart/Clear/{userId}")]
         Task Clear([Body] string userId);

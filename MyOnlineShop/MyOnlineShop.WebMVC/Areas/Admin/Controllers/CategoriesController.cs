@@ -44,41 +44,22 @@ namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
             return View(new List<CategoryIndexViewModel>());
         }
 
-        //public IActionResult Add()
-        //{
-        //    var addCategoryViewModel = new AddCategoryViewModel();
+        [HttpPost]
+        public async Task<IActionResult> Add(string name)
+        {
+            try
+            {
+                await this.catalogService.AddCategory(name);
 
-        //    return this.View(addCategoryViewModel);
-        //}
+                return this.RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Add(AddCategoryViewModel addCategoryViewModel)
-        //{
-        //    if (this.ModelState.IsValid)
-        //    {
-        //        var categoryExists = await this.dbContext
-        //            .Categories
-        //            .AnyAsync(x => x.Name.ToLower().Contains(addCategoryViewModel.Name.ToLower()));
-
-        //        if (categoryExists)
-        //        {
-        //            return BadRequest();
-        //        }
-
-        //        var newCategory = this.mapper.Map<AddCategoryViewModel, Category>(addCategoryViewModel);
-
-        //        await this.dbContext
-        //            .Categories
-        //            .AddAsync(newCategory);
-
-        //        await this.dbContext
-        //            .SaveChangesAsync();
-
-        //        return this.RedirectToAction(nameof(Index));
-        //    }
-
-        //    return this.View(addCategoryViewModel);
-        //}
+            return this.RedirectToAction(nameof(Index));
+        }
 
         [HttpPost]
         public async Task<IActionResult> StatusChange(int id)

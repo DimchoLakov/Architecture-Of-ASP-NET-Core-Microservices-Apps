@@ -10,6 +10,6 @@
 
         public string ProductDescription { get; set; }
 
-        public int PrimaryImageUrl { get; set; }
+        public string PrimaryImageUrl { get; set; }
     }
 }

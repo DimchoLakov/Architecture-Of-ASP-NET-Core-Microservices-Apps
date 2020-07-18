@@ -1,9 +1,11 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyOnlineShop.Common.Infrastructure;
 using MyOnlineShop.Ordering.Data;
+using System.Reflection;
 
 namespace MyOnlineShop.Ordering
 {
@@ -19,7 +21,8 @@ namespace MyOnlineShop.Ordering
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddWebService<OrderingDbContext>(this.Configuration);
+                .AddWebService<OrderingDbContext>(this.Configuration)
+                .AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

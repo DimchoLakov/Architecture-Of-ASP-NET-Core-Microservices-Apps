@@ -1,11 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.Controllers;
 using MyOnlineShop.Common.Services;
 using MyOnlineShop.Common.ViewModels.Orders;
+using MyOnlineShop.Common.ViewModels.ShoppingCarts;
+using MyOnlineShop.Ordering.Constants;
 using MyOnlineShop.Ordering.Data;
+using MyOnlineShop.Ordering.Data.Models.Orders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,19 +20,24 @@ namespace MyOnlineShop.Ordering.Controllers
     [Authorize]
     public class OrdersController : ApiController
     {
-        private readonly OrderingDbContext dbContext;
+        private readonly OrderingDbContext orderingDbContext;
         private readonly ICurrentUserService currentUser;
+        private readonly IMapper mapper;
 
-        public OrdersController(OrderingDbContext dbContext, ICurrentUserService currentUser)
+        public OrdersController(
+            OrderingDbContext dbContext, 
+            ICurrentUserService currentUser,
+            IMapper mapper)
         {
-            this.dbContext = dbContext;
+            this.orderingDbContext = dbContext;
             this.currentUser = currentUser;
+            this.mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<ICollection<OrderIndexViewModel>>> UserOrders([FromQuery] string userId)
         {
-            var orderIndexViewModels = await this.dbContext
+            var orderIndexViewModels = await this.orderingDbContext
                 .Orders
                 .Where(x => x.UserId == userId)
                 .Select(x => new OrderIndexViewModel
@@ -52,7 +62,7 @@ namespace MyOnlineShop.Ordering.Controllers
         [HttpGet(Id)]
         public async Task<ActionResult<OrderDetailsViewModel>> Details(int id)
         {
-            var orderExists = await this.dbContext
+            var orderExists = await this.orderingDbContext
                 .Orders
                 .AnyAsync(x => x.Id == id &&
                                x.UserId == this.currentUser.UserId);
@@ -62,7 +72,7 @@ namespace MyOnlineShop.Ordering.Controllers
                 return this.BadRequest(OrderConstants.OrderDoesNotExistMessage);
             }
 
-            var orderDetailsViewModel = await this.dbContext
+            var orderDetailsViewModel = await this.orderingDbContext
                 .Orders
                 .Where(x => x.Id == id &&
                             x.UserId == this.currentUser.UserId)
@@ -76,13 +86,42 @@ namespace MyOnlineShop.Ordering.Controllers
                                                   {
                                                       ProductName = oi.ProductName,
                                                       ProductPrice = oi.ProductPrice,
-                                                      Quantity = oi.Quantity
+                                                      Quantity = oi.Quantity,
+                                                      PrimaryImageUrl = oi.ProductImageUrl,
+                                                      ProductDescription = oi.ProductDescription
                                                   })
                                                   .ToList()
                 })
                 .FirstOrDefaultAsync();
 
             return this.Ok(orderDetailsViewModel);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> PlaceOrder([FromQuery] string userId, [FromQuery] int addressId, [FromBody] IEnumerable<CartItemViewModel> cartItemViewModels)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(OrderingConstants.InvalidOrderMessage);
+            }
+
+            var order = new Order
+            {
+                Date = DateTime.Now,
+                DeliveryAddressId = addressId,
+                DeliveryCost = new Random().Next(1, 9),
+                OrderItems = this.mapper.Map<IEnumerable<CartItemViewModel>, IEnumerable<OrderItem>>(cartItemViewModels).ToList(),
+                UserId = userId
+            };
+
+            await this.orderingDbContext
+                .Orders
+                .AddAsync(order);
+
+            await this.orderingDbContext
+                .SaveChangesAsync();
+
+            return this.Ok();
         }
     }
 }

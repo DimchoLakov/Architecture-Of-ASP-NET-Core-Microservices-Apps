@@ -37,11 +37,14 @@ namespace MyOnlineShop.WebMVC.Services.Catalog
         [Get("/Addresses/{userId}")]
         Task<AddressViewModel> GetAddress(string userId);
 
-        [Post("/Addresses/{userId}")]
+        [Post("/Addresses")]
         Task<int> CreateAddress([Query] string userId, OrderAddressViewModel orderAddressViewModel);
 
         [Get("/Categories")]
         Task<IEnumerable<CategoryIndexViewModel>> GetCategories();
+
+        [Post("/Categories")]
+        Task AddCategory(string name);
 
         [Put("/Categories/{id}")]
         Task ChangeCategoryStatus(int id);

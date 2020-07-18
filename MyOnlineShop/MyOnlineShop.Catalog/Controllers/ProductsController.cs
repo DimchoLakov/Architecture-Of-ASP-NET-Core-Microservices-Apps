@@ -137,7 +137,9 @@ namespace MyOnlineShop.Catalog.Controllers
                     Weight = x.Weight,
                     FromPageNumber = fromPage.Value,
                     ImageUrl = x.ImageUrl,
-                    IsArchived = x.IsArchived
+                    IsArchived = x.IsArchived,
+                    DateAdded = x.DateAdded,
+                    LastUpdated = x.LastUpdated
                 })
                 .FirstOrDefaultAsync();
 
@@ -181,6 +183,8 @@ namespace MyOnlineShop.Catalog.Controllers
                 }
 
                 var product = this.mapper.Map<CreateProductViewModel, Product>(createProductViewModel);
+                product.DateAdded = DateTime.Now;
+                product.LastUpdated = DateTime.Now;
 
                 if (createProductViewModel.CategoryId.HasValue)
                 {
@@ -274,6 +278,8 @@ namespace MyOnlineShop.Catalog.Controllers
                     .FirstOrDefaultAsync(x => x.Id == editProductViewModel.Id);
 
                 this.mapper.Map(editProductViewModel, product);
+
+                product.LastUpdated = DateTime.Now;
 
                 this.dbContext
                     .Products

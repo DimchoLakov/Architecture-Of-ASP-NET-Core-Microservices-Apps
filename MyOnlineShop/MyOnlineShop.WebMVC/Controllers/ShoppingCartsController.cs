@@ -62,7 +62,7 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 var cartItemViewModel = this.mapper.Map<ProductDetailsViewModel, CartItemViewModel>(productDetailsViewModel);
 
-                await this.shoppingCartService.AddToCart(cartItemViewModel);
+                await this.shoppingCartService.AddToCart(this.currentUserService.UserId, cartItemViewModel);
 
                 return this.Redirect($"/Products/Index/?currentPage={fromPage}");
             }
@@ -86,26 +86,26 @@ namespace MyOnlineShop.WebMVC.Controllers
             catch (Exception ex)
             {
                 this.HandleException(ex);
-
-                return this.Redirect(nameof(Index));
             }
+
+            return this.Redirect(nameof(Index));
         }
 
         [HttpPost]
-        public IActionResult RemoveItem(int productId)
+        public async Task<IActionResult> RemoveItem(int productId)
         {
             try
             {
-                this.shoppingCartService.RemoveItem(productId, this.currentUserService.UserId);
+                await this.shoppingCartService.RemoveItem(productId, this.currentUserService.UserId);
 
-                return this.RedirectToAction(nameof(Index));
+                return this.Redirect(nameof(Index));
             }
             catch (Exception ex)
             {
                 this.HandleException(ex);
-
-                return this.RedirectToAction(nameof(Index));
             }
+
+            return this.Redirect(nameof(Index));
         }
 
         public async Task<IActionResult> Checkout()

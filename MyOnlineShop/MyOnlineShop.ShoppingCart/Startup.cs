@@ -1,9 +1,11 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyOnlineShop.Common.Infrastructure;
 using MyOnlineShop.Ordering.Data;
+using System.Reflection;
 
 namespace MyOnlineShop.ShoppingCart
 {
@@ -19,7 +21,8 @@ namespace MyOnlineShop.ShoppingCart
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddWebService<ShoppingCartDbContext>(this.Configuration);
+                .AddWebService<ShoppingCartDbContext>(this.Configuration)
+                .AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

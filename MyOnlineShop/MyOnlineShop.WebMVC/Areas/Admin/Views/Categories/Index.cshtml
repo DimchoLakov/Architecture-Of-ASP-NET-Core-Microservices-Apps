@@ -10,11 +10,20 @@
 }
 
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-6 mb-3">
         @if (!Model.Any())
         {
             <p class="bg-warning d-inline-block p-1">No categories added yet.</p>
         }
+        <form method="post" asp-area="Admin" asp-controller="Categories" asp-action="Add">
+            <div class="input-group">
+                <label for="Name" class="col-form-label mr-2">Add new category</label>
+                <input type="text" name="Name" value="" id="Name" class="form-control" placeholder="e.g. Cars" />
+                <button type="submit" class="btn btn-success">Add</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-12">
         <div class="categories">
             @foreach (var categoryIndexViewModel in Model)
             {

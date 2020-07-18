@@ -6,6 +6,8 @@
 
         public bool IsDeliveryAddress { get; set; }
 
+        public bool IsAddressAvailable { get; set; }
+
         public string AddressLine { get; set; }
 
         public string Town { get; set; }

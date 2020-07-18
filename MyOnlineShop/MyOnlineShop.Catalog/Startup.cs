@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyOnlineShop.Catalog.DataSeed;
+using MyOnlineShop.Catalog.Filters;
 using MyOnlineShop.Common.Infrastructure;
 using MyOnlineShop.Common.Services;
 using MyOnlineShop.Ordering.Data;
@@ -25,6 +26,7 @@ namespace MyOnlineShop.Catalog
             services
                 .AddWebService<CatalogDbContext>(this.Configuration)
                 .AddTransient<IDataSeeder, CatalogDataSeeder>()
+                .AddScoped<AddCustomerActionFilter>()
                 .AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 

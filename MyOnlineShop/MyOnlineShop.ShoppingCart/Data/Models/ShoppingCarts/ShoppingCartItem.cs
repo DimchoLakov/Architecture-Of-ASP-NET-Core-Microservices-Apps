@@ -24,6 +24,8 @@ namespace MyOnlineShop.ShoppingCart.Data.Models.ShoppingCarts
         public double ProductWeight { get; set; }
 
         public decimal ProductPrice { get; set; }
+        
+        public string ProductDescription { get; set; }
 
         public string ProductImageUrl { get; set; }
 

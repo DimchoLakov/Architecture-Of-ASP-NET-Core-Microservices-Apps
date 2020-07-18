@@ -51,6 +51,7 @@
         else
         {
             <form method="post" asp-area="" asp-controller="ShoppingCarts" asp-action="Checkout" class="mb-2">
+                <input asp-for="OrderAddressViewModel.IsAddressAvailable" type="hidden" required>
                 <div class="form-group row">
                     <label asp-for="OrderAddressViewModel.AddressLine" class="col-md-2 col-form-label"></label>
                     <div class="col-md-6">
