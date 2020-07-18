@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Catalog.Constants;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace MyOnlineShop.Catalog.Controllers
 {
+    [Authorize]
     public class CategoriesController : ApiController
     {
         private readonly CatalogDbContext dbContext;
@@ -27,13 +29,14 @@ namespace MyOnlineShop.Catalog.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<CategoryIndexViewModel>>> Index()
+        public async Task<ActionResult<IEnumerable<CategoryIndexViewModel>>> Index()
         {
             var categoryIndexViewModels = await this.dbContext
                 .Categories
                 .Take(CategoryConstants.MaxTake)
                 .Select(x => new CategoryIndexViewModel
                 {
+                    Id = x.Id,
                     Name = x.Name,
                     IsActive = x.IsActive
                 })
@@ -43,6 +46,7 @@ namespace MyOnlineShop.Catalog.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = AdminConstants.AdministratorRole)]
         public async Task<ActionResult> Add(AddCategoryViewModel addCategoryViewModel)
         {
             if (this.ModelState.IsValid)
@@ -103,21 +107,7 @@ namespace MyOnlineShop.Catalog.Controllers
                                                   Id = cp.Product.Id,
                                                   Name = cp.Product.Name,
                                                   Description = cp.Product.Description,
-                                                  ImageViewModel = new ProductImageViewModel
-                                                  {
-                                                      Id = cp
-                                                            .Product
-                                                            .Images
-                                                            .Where(i => i.IsPrimary)
-                                                            .Select(i => i.Id)
-                                                            .FirstOrDefault(),
-                                                      Name = cp
-                                                              .Product
-                                                              .Images
-                                                              .Where(i => i.IsPrimary)
-                                                              .Select(i => i.Name)
-                                                              .FirstOrDefault(),
-                                                  }
+                                                  ImageUrl = cp.Product.ImageUrl
                                               })
                 })
                 .FirstOrDefaultAsync();
@@ -127,6 +117,7 @@ namespace MyOnlineShop.Catalog.Controllers
 
         [HttpPut]
         [Route(Id)]
+        [Authorize(Roles = AdminConstants.AdministratorRole)]
         public async Task<ActionResult> StatusChange(int id)
         {
             var category = await this.dbContext

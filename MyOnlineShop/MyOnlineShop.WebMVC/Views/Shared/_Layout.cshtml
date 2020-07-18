@@ -31,8 +31,6 @@
                                 <div class="dropdown-menu" aria-labelledby="AdminAreaNavbarDropdown">
                                     <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="dropdown-item">Manage Products</a>
                                     <a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="dropdown-item">Manage Categories</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="dropdown-item">Manage Orders</a>
                                 </div>
                             </li>
                             <li class="nav-item">
@@ -43,7 +41,7 @@
                             </li>
                         </ul>
                     }
-                    else
+                    else if(!string.IsNullOrWhiteSpace(this.CurrentUserService.UserId))
                     {
                         <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">

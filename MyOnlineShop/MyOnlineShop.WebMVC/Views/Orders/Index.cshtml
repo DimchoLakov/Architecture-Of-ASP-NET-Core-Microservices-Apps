@@ -5,13 +5,20 @@
 }
 
 <div class="row">
-    @foreach (var orderIndexViewModel in Model)
+    @if (!Model.Any())
     {
-        <div class="col-md-auto order-item mr-2 mb-2">
-            <a asp-area="" asp-controller="Orders" asp-action="Details" asp-route-id="@orderIndexViewModel.Id">
-                <p>@orderIndexViewModel.Date</p>
-                <p>@orderIndexViewModel.Orders</p>
-            </a>
-        </div>
+        <p class="bg-info d-inline-block text-white p-1">You don't have any orders.</p>
+    }
+    else
+    {
+        @foreach (var orderIndexViewModel in Model)
+        {
+            <div class="col-md-auto order-item mr-2 mb-2">
+                <a asp-area="" asp-controller="Orders" asp-action="Details" asp-route-id="@orderIndexViewModel.Id">
+                    <p>@orderIndexViewModel.Date</p>
+                    <p>@orderIndexViewModel.Orders</p>
+                </a>
+            </div>
+        }
     }
 </div>

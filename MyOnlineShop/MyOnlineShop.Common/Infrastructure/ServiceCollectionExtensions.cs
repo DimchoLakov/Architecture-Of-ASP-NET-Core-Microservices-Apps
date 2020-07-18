@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MyOnlineShop.Common.Services;
+using Newtonsoft.Json;
 using System.Text;
 
 namespace MyOnlineShop.Common.Infrastructure
@@ -19,7 +20,12 @@ namespace MyOnlineShop.Common.Infrastructure
                 .AddDatabase<TDbContext>(configuration)
                 .AddApplicationSettings(configuration)
                 .AddJwtTokenAuthentication(configuration)
-                .AddControllers();
+                .AddControllers()
+                .AddNewtonsoftJson(options => 
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.Formatting = Formatting.Indented;
+                });
 
             return services;
         }

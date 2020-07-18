@@ -5,11 +5,6 @@ namespace MyOnlineShop.Common.ViewModels.Products
 {
     public class ProductDetailsViewModel
     {
-        public ProductDetailsViewModel()
-        {
-            this.ImageViewModels = new List<ProductImageViewModel>();
-        }
-
         public int Id { get; set; }
 
         public string Name { get; set; }
@@ -22,6 +17,8 @@ namespace MyOnlineShop.Common.ViewModels.Products
 
         public string Description { get; set; }
 
+        public string ImageUrl { get; set; }
+
         public DateTime DateAdded { get; set; }
         
         public DateTime LastUpdated { get; set; }
@@ -29,9 +26,5 @@ namespace MyOnlineShop.Common.ViewModels.Products
         public bool IsArchived { get; set; }
 
         public int FromPageNumber { get; set; }
-
-        public ProductImageViewModel PrimaryImageViewModel { get; set; }
-
-        public ICollection<ProductImageViewModel> ImageViewModels { get; set; }
     }
 }

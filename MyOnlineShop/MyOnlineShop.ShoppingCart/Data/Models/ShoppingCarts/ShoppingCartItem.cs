@@ -25,6 +25,8 @@ namespace MyOnlineShop.ShoppingCart.Data.Models.ShoppingCarts
 
         public decimal ProductPrice { get; set; }
 
+        public string ProductImageUrl { get; set; }
+
         public string ShoppingCartId { get; set; }
         public ShoppingCart ShoppingCart { get; set; }
     }

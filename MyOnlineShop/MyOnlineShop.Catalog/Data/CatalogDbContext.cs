@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyOnlineShop.Catalog.Data.Configurations;
 using MyOnlineShop.Catalog.Data.Models.Categories;
 using MyOnlineShop.Catalog.Data.Models.Customers;
-using MyOnlineShop.Catalog.Data.Models.Galleries;
 using MyOnlineShop.Catalog.Data.Models.Products;
 using System.Reflection;
 
@@ -20,8 +18,6 @@ namespace MyOnlineShop.Ordering.Data
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<Customer> Customers { get; set; }
-
-        public DbSet<Image> Images { get; set; }
 
         public DbSet<ProductCategory> ProductCategories { get; set; }
         

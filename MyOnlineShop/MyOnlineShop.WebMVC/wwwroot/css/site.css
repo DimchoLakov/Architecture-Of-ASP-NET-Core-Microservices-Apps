@@ -107,12 +107,12 @@ body {
     border: 1px solid black;
 }
 
-.product-image::after,
-.media::after {
-    display: block;
-    content: '';
-    padding-top: 56.25%;
-}
+    .product-image::after,
+    .media::after {
+        display: block;
+        content: '';
+        padding-top: 56.25%;
+    }
 
 .product-image img {
     width: 100%;
@@ -131,8 +131,18 @@ body {
     transform: translate(-50%, -50%);
 }
 
+.categories {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.category {
+    margin-right: 2em;
+}
+
 .cart-item,
-.order-item {
+.order-item,
+.category {
     border: 1px solid black;
     border-radius: 0.2rem;
     padding: 0.5rem 0.5rem 0 0.5rem;

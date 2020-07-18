@@ -22,11 +22,6 @@ namespace MyOnlineShop.Catalog.Data.Configurations
             builder
                 .Property(x => x.Description)
                 .IsRequired();
-
-            builder
-                .HasMany(x => x.Images)
-                .WithOne(x => x.Product)
-                .HasForeignKey(x => x.ProductId);
         }
     }
 }

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MyOnlineShop.Catalog.DataSeed;
 using MyOnlineShop.Common.Infrastructure;
+using MyOnlineShop.Common.Services;
 using MyOnlineShop.Ordering.Data;
 using System.Reflection;
 
@@ -22,6 +24,7 @@ namespace MyOnlineShop.Catalog
         {
             services
                 .AddWebService<CatalogDbContext>(this.Configuration)
+                .AddTransient<IDataSeeder, CatalogDataSeeder>()
                 .AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 

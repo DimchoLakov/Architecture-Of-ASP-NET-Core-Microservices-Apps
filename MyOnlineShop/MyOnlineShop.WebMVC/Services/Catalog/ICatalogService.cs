@@ -1,8 +1,9 @@
 ﻿using MyOnlineShop.Common.ViewModels.Addresses;
-using MyOnlineShop.Common.ViewModels.Images;
+using MyOnlineShop.Common.ViewModels.Categories;
 using MyOnlineShop.Common.ViewModels.Products;
 using MyOnlineShop.Common.ViewModels.ShoppingCarts;
 using Refit;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC.Services.Catalog
@@ -10,19 +11,19 @@ namespace MyOnlineShop.WebMVC.Services.Catalog
     public interface ICatalogService
     {
         [Get("/Products")]
-        Task<ProductPaginationViewModel> GetProductPagination([Query] int? currentPage = 1, [Query] string search = null);
+        Task<ProductPaginationViewModel> GetProductPagination([Query] string area, [Query] int? currentPage = 1, [Query] string search = null);
 
         [Get("/Products/{id}")]
-        Task<ProductDetailsViewModel> GetProductDetails([Query] int id, [Query] int? fromPage);
+        Task<ProductDetailsViewModel> GetProductDetails(int id, int? fromPage);
 
         [Get("/Products/GetCreate")]
         Task<CreateProductViewModel> GetCreateProduct();
 
         [Post("/Products")]
-        Task CreateProduct(CreateProductViewModel createProductViewModel);
+        Task CreateProduct([Body] CreateProductViewModel createProductViewModel);
 
         [Get("/Products/GetEdit")]
-        Task<EditProductViewModel> GetEditProduct();
+        Task<EditProductViewModel> GetEditProduct([Query] int id, [Query] int? fromPage);
 
         [Put("/Products")]
         Task EditProduct(EditProductViewModel editProductViewModel);
@@ -30,19 +31,19 @@ namespace MyOnlineShop.WebMVC.Services.Catalog
         [Post("/Products/Archive/{id}")]
         Task ArchiveProduct(int id);
 
-        [Get("/Images/{id}")]
-        Task<ImageViewModel> GetImage(int id);
-
-        [Delete("/Images/{id}")]
-        Task DeleteImage(int id);
-
-        [Post("/Images/{productId}")]
-        Task AddImageToProduct(int productId, [Body] AddImageViewModel addImageViewModel);
+        [Post("/Products/Unarchive/{id}")]
+        Task UnarchiveProduct(int id);
 
         [Get("/Addresses/{userId}")]
         Task<AddressViewModel> GetAddress(string userId);
 
         [Post("/Addresses/{userId}")]
         Task<int> CreateAddress([Query] string userId, OrderAddressViewModel orderAddressViewModel);
+
+        [Get("/Categories")]
+        Task<IEnumerable<CategoryIndexViewModel>> GetCategories();
+
+        [Put("/Categories/{id}")]
+        Task ChangeCategoryStatus(int id);
     }
 }

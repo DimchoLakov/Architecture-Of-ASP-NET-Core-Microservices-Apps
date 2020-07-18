@@ -1,5 +1,4 @@
-﻿using MyOnlineShop.Catalog.Data.Models.Galleries;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MyOnlineShop.Catalog.Data.Models.Products
@@ -8,7 +7,6 @@ namespace MyOnlineShop.Catalog.Data.Models.Products
     {
         public Product()
         {
-            this.Images = new HashSet<Image>();
             this.ProductCategories = new HashSet<ProductCategory>();
         }
 
@@ -24,13 +22,13 @@ namespace MyOnlineShop.Catalog.Data.Models.Products
 
         public string Description { get; set; }
 
+        public string ImageUrl { get; set; }
+
         public bool IsArchived { get; set; }
 
         public DateTime DateAdded { get; set; }
 
         public DateTime LastUpdated { get; set; }
-
-        public ICollection<Image> Images { get; set; }
 
         public ICollection<ProductCategory> ProductCategories { get; set; }
     }

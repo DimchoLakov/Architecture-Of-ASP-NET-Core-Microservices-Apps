@@ -9,49 +9,68 @@
     <input asp-for="FromPageNumber" type="hidden" />
     <div class="row mb-2">
         <div class="col-md-4">
-            <img src="@Url.Content($"~/Images/Get/?id={Model.PrimaryImageViewModel.Id}")" alt="@Model.PrimaryImageViewModel.Name" class="card-img">
+            <img src="@Model.ImageUrl" alt="Image" class="card-img">
         </div>
         <div class="col-md-5">
             <h5>
                 <label asp-for="Name"></label>
-                <input asp-for="Name" />
+                <input asp-for="Name" class="form-control" />
             </h5>
             <p>
                 <label asp-for="Price"></label>
-                <input asp-for="Price" />
+                <input asp-for="Price" class="form-control" />
             </p>
             <p>
                 <label asp-for="StockAvailable"></label>
-                <input asp-for="StockAvailable" />
+                <input asp-for="StockAvailable" class="form-control" />
             </p>
             <p>
                 <label asp-for="Weight"></label>
-                <input asp-for="Weight" />
+                <input asp-for="Weight" class="form-control" />
+            </p>
+            <p>
+                <label asp-for="ImageUrl"></label>
+                <input asp-for="ImageUrl" class="form-control" />
             </p>
             <p class="d-md-flex">
                 <label asp-for="Description" class="mr-1"></label>
-                <textarea asp-for="Description" rows="5" cols="50"></textarea>
+                <textarea asp-for="Description" rows="5" cols="50" class="form-control"></textarea>
             </p>
             <p>Date Added: @Model.DateAdded.ToString("dd/MMMM/yyyy HH:mm")</p>
             <p>Date Last Updated: @Model.LastUpdated.ToString("dd/MMMM/yyyy HH:mm")</p>
-            <p class="d-md-inline-block p-2 text-white bg-@(Model.IsArchived ? "success" : "danger")">@(Model.IsArchived ? "Unarchive" : "Archive")</p>
         </div>
     </div>
     <div class="row mb-2">
         <div class="col-md-12">
             <div class="d-md-flex flex-md-row flex-md-wrap">
-                @foreach (var imageViewModel in Model.ImageViewModels)
-                {
-                    <div class="product-image">
-                        <img src="@Url.Content($"~/Images/Get/?id={imageViewModel.Id}")" alt="@imageViewModel.Name" class="img-fluid" />
-                    </div>
-                }
+                <div class="product-image">
+                    <img src="@Model.ImageUrl" alt="Image" class="img-fluid" />
+                </div>
             </div>
         </div>
     </div>
 
     <div class="text-center">
+        <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id" asp-route-currentPage="@Model.FromPageNumber" class="btn btn-secondary w-25">Back</a>
         <a asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-currentPage="@Model.FromPageNumber" class="btn btn-secondary w-25">Cancel</a>
         <button type="submit" class="btn btn-success w-25">Save Changes</button>
     </div>
 </form>
+<div class="row">
+    <div class="col-sm-6 offset-md-3">
+        @if (!Model.IsArchived)
+        {
+            <form method="post" asp-area="Admin" asp-controller="Products" asp-action="Archive" class="p-2">
+                <input asp-for="Id" type="hidden" />
+                <button type="submit" class="btn btn-danger w-100">Archive</button>
+            </form>
+        }
+        else
+        {
+            <form method="post" asp-area="Admin" asp-controller="Products" asp-action="Unarchive" class="p-2">
+                <input asp-for="Id" type="hidden" />
+                <button type="submit" class="btn btn-success w-100">Unarchive</button>
+            </form>
+        }
+    </div>
+</div>

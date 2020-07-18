@@ -9,7 +9,7 @@ namespace MyOnlineShop.Common.ViewModels.Products
     {
         public CreateProductViewModel()
         {
-            this.Files = new List<IFormFile>();
+            this.Categories = new List<SelectListItem>();
         }
 
         [Display(Name = "Product Name")]
@@ -35,11 +35,13 @@ namespace MyOnlineShop.Common.ViewModels.Products
         [Required]
         public string Description { get; set; }
 
+        [Display(Name = "Image")]
+        [DataType(DataType.Url)]
+        [Required]
+        public string ImageUrl { get; set; }
+
         [Display(Name = "Category")]
         public int? CategoryId { get; set; }
         public ICollection<SelectListItem> Categories { get; set; }
-
-        [Display(Name = "Images")]
-        public ICollection<IFormFile> Files { get; set; }
     }
 }

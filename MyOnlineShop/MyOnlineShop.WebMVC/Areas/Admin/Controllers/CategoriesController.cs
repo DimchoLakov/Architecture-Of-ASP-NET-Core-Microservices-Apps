@@ -6,38 +6,43 @@ using MyOnlineShop.Common.ViewModels.Categories;
 using MyOnlineShop.Common.ViewModels.Products;
 using System.Linq;
 using System.Threading.Tasks;
-
-using static MyOnlineShop.WebMVC.Constants.AdminConstants;
+using MyOnlineShop.Common.Constants;
+using MyOnlineShop.WebMVC.Services.Catalog;
+using System;
+using System.Collections.Generic;
 
 namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
 {
-    [Authorize(Roles = AdministratorRole)]
-    [Area(AdminArea)]
+    [Authorize(Roles = AuthConstants.AdministratorRoleName)]
+    [Area(AuthConstants.AdminAreaName)]
     public class CategoriesController : Controller
     {
-        //private readonly ApplicationDbContext dbContext;
-        //private readonly IMapper mapper;
+        private readonly ICatalogService catalogService;
+        private readonly IMapper mapper;
 
-        //public CategoriesController(ApplicationDbContext dbContext, IMapper mapper)
-        //{
-        //    this.dbContext = dbContext;
-        //    this.mapper = mapper;
-        //}
+        public CategoriesController(
+            ICatalogService catalogService,
+            IMapper mapper)
+        {
+            this.catalogService = catalogService;
+            this.mapper = mapper;
+        }
 
-        //public async Task<IActionResult> Index()
-        //{
-        //    var categoryIndexViewModels = await this.dbContext
-        //        .Categories
-        //        .Take(10)
-        //        .Select(x => new CategoryIndexViewModel
-        //        {
-        //            Name = x.Name,
-        //            IsActive = x.IsActive
-        //        })
-        //        .ToListAsync();
+        public async Task<IActionResult> Index()
+        {
+            try
+            {
+                var categoryIndexViewModels = await this.catalogService.GetCategories();
 
-        //    return View(categoryIndexViewModels);
-        //}
+                return View(categoryIndexViewModels);
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
+
+            return View(new List<CategoryIndexViewModel>());
+        }
 
         //public IActionResult Add()
         //{
@@ -75,73 +80,26 @@ namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
         //    return this.View(addCategoryViewModel);
         //}
 
-        //public async Task<IActionResult> Details(int id)
-        //{
-        //    var categoryExists = await this.dbContext
-        //        .Categories
-        //        .AnyAsync(x => x.Id == id);
+        [HttpPost]
+        public async Task<IActionResult> StatusChange(int id)
+        {
+            try
+            {
+                await this.catalogService.ChangeCategoryStatus(id);
 
-        //    if (!categoryExists)
-        //    {
-        //        return this.BadRequest();
-        //    }
+                return this.RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //    var categoryDetailsViewModel = await this.dbContext
-        //        .Categories
-        //        .Where(x => x.Id == id)
-        //        .Select(x => new CategoryDetailsViewModel
-        //        {
-        //            Name = x.Name,
-        //            IsActive = x.IsActive,
-        //            ProductIndexViewModels = x
-        //                                      .CategoryProducts
-        //                                      .Select(cp => new ProductIndexViewModel
-        //                                      {
-        //                                          Id = cp.Product.Id,
-        //                                          Name = cp.Product.Name,
-        //                                          Description = cp.Product.Description,
-        //                                          ImageViewModel = new ProductImageViewModel
-        //                                          {
-        //                                              Id = cp
-        //                                                    .Product
-        //                                                    .Images
-        //                                                    .Where(i => i.IsPrimary)
-        //                                                    .Select(i => i.Id)
-        //                                                    .FirstOrDefault(),
-        //                                              Name = cp
-        //                                                      .Product
-        //                                                      .Images
-        //                                                      .Where(i => i.IsPrimary)
-        //                                                      .Select(i => i.Name)
-        //                                                      .FirstOrDefault(),
-        //                                          }
-        //                                      })
-        //        })
-        //        .FirstOrDefaultAsync();
+            return this.RedirectToAction(nameof(Index));
+        }
 
-        //    return this.View(categoryDetailsViewModel);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> StatusChange(int id)
-        //{
-        //    var category = await this.dbContext
-        //        .Categories
-        //        .FindAsync(id);
-
-        //    category.IsActive = !category.IsActive;
-
-        //    this.dbContext
-        //        .Categories
-        //        .Update(category);
-
-        //    var rowsAffected = await this.dbContext
-        //        .SaveChangesAsync();
-
-        //    return this.Json(new
-        //    {
-        //        updated = rowsAffected == 1
-        //    });
-        //}
+        private void HandleException(Exception ex)
+        {
+            ViewBag.CatalogInoperativeMsg = $"Catalog Service is inoperative {ex.GetType().Name} - {ex.Message}";
+        }
     }
 }

@@ -18,6 +18,7 @@ using Refit;
 using System;
 using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC
 {
@@ -32,25 +33,16 @@ namespace MyOnlineShop.WebMVC
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
-            services.AddSession(options =>
-            {
-                options.Cookie.IsEssential = true;
-                options.Cookie.HttpOnly = true;
-                options.IdleTimeout = TimeSpan.FromHours(8);
-            });
-
             var serviceEndpoints = this.Configuration
                 .GetSection(nameof(ServiceEndpoints))
                 .Get<ServiceEndpoints>(config => config.BindNonPublicProperties = true);
 
             services
+                .AddRouting()
+                .AddAutoMapper(Assembly.GetExecutingAssembly())
                 .AddJwtTokenAuthentication(this.Configuration)
                 .AddScoped<ICurrentTokenService, CurrentTokenService>()
+                .AddScoped<ICurrentUserService, CurrentUserService>()
                 .AddTransient<JwtCookieAuthenticationMiddleware>();
 
             services
@@ -69,17 +61,6 @@ namespace MyOnlineShop.WebMVC
              .AddRefitClient<ICatalogService>()
              .WithConfiguration(serviceEndpoints.Catalog);
 
-            services.AddRouting();
-
-            services.AddAuthentication();
-            services.AddAuthorization();
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.LoginPath = "/Identity/Login";
-                options.AccessDeniedPath = "/Identity/AccessDenied";
-            });
-
             services.AddRazorPages();
             services.AddControllersWithViews(options =>
             {
@@ -88,9 +69,8 @@ namespace MyOnlineShop.WebMVC
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.Formatting = Formatting.Indented;
                 });
-
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -105,44 +85,35 @@ namespace MyOnlineShop.WebMVC
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
-
-            app.UseStatusCodePages(async context =>
-            {
-                var request = context.HttpContext.Request;
-                var response = context.HttpContext.Response;
-
-                if (response.StatusCode == (int)HttpStatusCode.Unauthorized)
+            app
+                .UseHttpsRedirection()
+                .UseStaticFiles()
+                .UseStatusCodePages(async context =>
+                await Task.Run(() =>
                 {
-                    response.Redirect("/Identity/Login");
-                }
-            });
+                    var request = context.HttpContext.Request;
+                    var response = context.HttpContext.Response;
+
+                    if (response.StatusCode == (int)HttpStatusCode.Unauthorized)
+                    {
+                        response.Redirect("/Identity/Login");
+                    }
+                }))
+                .UseRouting()
+                .UseJwtHeaderAuthentication()
+                .UseAuthorization()
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllerRoute(
+                        name: "areas",
+                        pattern: "{area:exists}/{controller=Products}/{action=Index}/{id?}");
+
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller=Products}/{action=Index}/{id?}");
+                });
 
             //app.UseStatusCodePagesWithReExecute("/Home/Error/", "?/StatusCode={0}");
-
-            app.UseSession();
-
-            app.UseRouting();
-
-            app.UseMiddleware<JwtCookieAuthenticationMiddleware>();
-
-            app.UseAuthorization();
-            app.UseAuthentication();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "areas",
-                    pattern: "{area:exists}/{controller=Products}/{action=Index}/{id?}");
-
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Products}/{action=Index}/{id?}");
-
-                endpoints.MapRazorPages();
-            });
         }
     }
 }

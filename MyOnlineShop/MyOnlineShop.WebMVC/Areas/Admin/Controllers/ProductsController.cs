@@ -1,360 +1,177 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using MyOnlineShop.Common.ViewModels.Pagination;
+using MyOnlineShop.Common.Constants;
+using MyOnlineShop.Common.Services;
 using MyOnlineShop.Common.ViewModels.Products;
+using MyOnlineShop.WebMVC.Services.Catalog;
 using System;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using static MyOnlineShop.WebMVC.Constants.AdminConstants;
-using static MyOnlineShop.WebMVC.Constants.ImageConstants;
-using static MyOnlineShop.WebMVC.Constants.ProductConstants;
-
 namespace MyOnlineShop.WebMVC.Areas.Admin.Controllers
 {
-    [Authorize(Roles = AdministratorRole)]
-    [Area(AdminArea)]
+    [Authorize(Roles = AuthConstants.AdministratorRoleName)]
+    [Area(AuthConstants.AdminAreaName)]
     public class ProductsController : Controller
     {
-        //private readonly ApplicationDbContext dbContext;
-        //private readonly IMapper mapper;
+        private readonly ICatalogService catalogService;
+        private readonly ICurrentTokenService currentTokenService;
+        private readonly IMapper mapper;
 
-        //public ProductsController(ApplicationDbContext dbContext, IMapper mapper)
-        //{
-        //    this.dbContext = dbContext;
-        //    this.mapper = mapper;
-        //}
+        public ProductsController(
+            ICatalogService catalogService, 
+            IMapper mapper,
+            ICurrentTokenService currentTokenService)
+        {
+            this.catalogService = catalogService;
+            this.currentTokenService = currentTokenService;
+            this.mapper = mapper;
+        }
 
-        //public async Task<IActionResult> Index(int? currentPage = 1, string search = null)
-        //{
-        //    int count = await this.dbContext
-        //        .Products
-        //        .CountAsync();
+        public async Task<IActionResult> Index(int? currentPage = 1, string search = null)
+        {
+            try
+            {
+                var productPaginationViewModel = await this.catalogService.GetProductPagination(AuthConstants.AdminAreaName, currentPage, search);
 
-        //    int size = MaxTakeCount;
-        //    int totalPages = (int)Math.Ceiling(decimal.Divide(count, size));
+                return this.View(productPaginationViewModel);
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //    if (currentPage < 1)
-        //    {
-        //        currentPage = 1;
-        //    }
-        //    if (currentPage > totalPages)
-        //    {
-        //        currentPage = totalPages;
-        //    }
+            return this.View(new ProductPaginationViewModel());
+        }
 
-        //    int skip = (int)(currentPage - 1) * size;
-        //    if (skip < 0)
-        //    {
-        //        skip = 0;
-        //    }
-        //    int take = size;
+        public async Task<IActionResult> Details(int id, int? fromPage = 1)
+        {
+            try
+            {
+                var productDetailsViewModel = await this.catalogService.GetProductDetails(id, fromPage);
 
-        //    var query = this.dbContext
-        //        .Products
-        //        .Where(x => !x.IsArchived);
-        //    if (!string.IsNullOrWhiteSpace(search))
-        //    {
-        //        query = query
-        //            .Where(x => x.Name.ToLower().Contains(search.ToLower()));
-        //    }
+                return this.View(productDetailsViewModel);
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //    var productPaginationViewModel = new ProductPaginationViewModel
-        //    {
-        //        Search = search,
-        //        PaginationViewModel = new PaginationViewModel
-        //        {
-        //            CurrentPage = currentPage.Value,
-        //            TotalPages = totalPages
-        //        },
-        //        ProductIndexViewModels = await query
-        //        .Skip(skip)
-        //        .Take(take)
-        //        .Take(MaxTakeCount)
-        //        .Select(x => new ProductIndexViewModel()
-        //        {
-        //            Id = x.Id,
-        //            Description = x.Description,
-        //            Name = x.Name,
-        //            Price = x.Price,
-        //            ImageViewModel = new ProductImageViewModel()
-        //            {
-        //                Id = x
-        //                .Images
-        //                .Where(i => i.IsPrimary)
-        //                .Select(i => i.Id)
-        //                .FirstOrDefault(),
-        //                Name = x
-        //                .Images
-        //                .Where(i => i.IsPrimary)
-        //                .Select(i => i.Name)
-        //                .FirstOrDefault(),
-        //            }
-        //        })
-        //        .ToListAsync()
-        //    };
+            return this.View(new ProductDetailsViewModel());
+        }
 
-        //    return this.View(productPaginationViewModel);
-        //}
+        public async Task<IActionResult> Create()
+        {
+            try
+            {
+                var createProductViewModel = await this.catalogService.GetCreateProduct();
 
-        //public async Task<IActionResult> Details(int id, int? fromPage = 1)
-        //{
-        //    var productExists = await this.dbContext
-        //        .Products
-        //        .AnyAsync(x => x.Id == id);
+                return this.View(createProductViewModel);
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //    if (!productExists)
-        //    {
-        //        return this.BadRequest(ProductDoesNotExistMessage);
-        //    }
+            return this.View(new CreateProductViewModel());
+        }
 
-        //    var productDetailsViewModel = await this.dbContext
-        //        .Products
-        //        .Where(x => x.Id == id)
-        //        .Select(x => new ProductDetailsViewModel
-        //        {
-        //            Id = x.Id,
-        //            Description = x.Description,
-        //            Name = x.Name,
-        //            Price = x.Price,
-        //            StockAvailable = x.StockAvailable,
-        //            Weight = x.Weight,
-        //            DateAdded = x.DateAdded,
-        //            LastUpdated = x.LastUpdated,
-        //            IsArchived = x.IsArchived,
-        //            FromPageNumber = fromPage.Value,
-        //            PrimaryImageViewModel = new ProductImageViewModel
-        //            {
-        //                Id = x
-        //                      .Images
-        //                      .Where(i => i.IsPrimary)
-        //                      .Select(i => i.Id)
-        //                      .FirstOrDefault(),
-        //                Name = x
-        //                      .Images
-        //                      .Where(i => i.IsPrimary)
-        //                      .Select(i => i.Name)
-        //                      .FirstOrDefault()
-        //            },
-        //            ImageViewModels = x
-        //                .Images
-        //                .Select(i => new ProductImageViewModel
-        //                {
-        //                    Id = i.Id,
-        //                    Name = i.Name
-        //                })
-        //                .ToList()
-        //        })
-        //        .FirstOrDefaultAsync();
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateProductViewModel createProductViewModel)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(createProductViewModel);
+            }
 
-        //    return this.View(productDetailsViewModel);
-        //}
+            try
+            {
+                await this.catalogService.CreateProduct(createProductViewModel);
 
-        //public async Task<IActionResult> Create()
-        //{
-        //    var createProductViewModel = new CreateProductViewModel
-        //    {
-        //        Categories = await this.dbContext
-        //            .Categories
-        //            .Select(x => new SelectListItem
-        //            {
-        //                Text = x.Name,
-        //                Value = x.Id.ToString()
-        //            })
-        //            .ToListAsync()
-        //    };
+                return this.RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //    return this.View(createProductViewModel);
-        //}
+            return this.View(createProductViewModel);
+        }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Create(CreateProductViewModel createProductViewModel)
-        //{
-        //    if (this.ModelState.IsValid)
-        //    {
-        //        var productNameExists = await this.dbContext
-        //            .Products
-        //            .AnyAsync(x => x.Name.ToLower() == createProductViewModel.Name.ToLower());
+        public async Task<IActionResult> Edit(int id, int? fromPage = 1)
+        {
+            try
+            {
+                var editProductViewModel = await this.catalogService.GetEditProduct(id, fromPage);
 
-        //        if (productNameExists)
-        //        {
-        //            throw new Exception(string.Format(ProductAlreadyExists, createProductViewModel.Name));
-        //        }
+                return this.View(editProductViewModel);
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //        var product = this.mapper.Map<CreateProductViewModel, Product>(createProductViewModel);
+            return this.View(new EditProductViewModel());
+        }
 
-        //        if (createProductViewModel.CategoryId.HasValue)
-        //        {
-        //            var categoryExists = await this.dbContext
-        //                .Categories
-        //                .AnyAsync(x => x.Id == createProductViewModel.CategoryId);
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditProductViewModel editProductViewModel)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(editProductViewModel);
+            }
 
-        //            if (categoryExists)
-        //            {
-        //                var productCategory = new ProductCategory
-        //                {
-        //                    CategoryId = createProductViewModel.CategoryId.Value
-        //                };
-        //                product
-        //                    .ProductCategories
-        //                    .Add(productCategory);
-        //            }
-        //        }
+            try
+            {
+                await this.catalogService.EditProduct(editProductViewModel);
 
-        //        if (createProductViewModel.Files.Any())
-        //        {
-        //            var imageTypes = new string[]
-        //            {
-        //                ".tif", ".tiff", ".bmp", ".jpg", ".jpeg", ".gif", ".png", ".eps", ".raw", ".cr2", ".nef", ".orf", ".sr2"
-        //            };
+                return this.RedirectToAction(nameof(Index), new { currentPage = editProductViewModel.FromPageNumber });
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //            var count = 0;
-        //            foreach (IFormFile file in createProductViewModel.Files)
-        //            {
-        //                count++;
-        //                string imageExtension = Path.GetExtension(file.FileName);
-        //                if (!imageTypes.Contains(imageExtension))
-        //                {
-        //                    return this.BadRequest(string.Format(ImageTypeNotAllowedMessage, imageExtension));
-        //                }
+            return this.View(editProductViewModel);
+        }
 
-        //                var image = new Image
-        //                {
-        //                    Name = file.FileName,
-        //                    IsPrimary = count == 1,
-        //                    MimeType = imageExtension
-        //                };
+        [HttpPost]
+        public async Task<IActionResult> Archive(int id)
+        {
+            try
+            {
+                await this.catalogService.ArchiveProduct(id);
 
-        //                using var memoryStream = new MemoryStream();
-        //                file.CopyTo(memoryStream);
-        //                byte[] fileBytes = memoryStream.ToArray();
-        //                image.Content = fileBytes;
+                return this.RedirectToAction(nameof(Edit), new { id = id });
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //                product.Images.Add(image);
-        //            }
-        //        }
+            return this.RedirectToAction(nameof(Edit), new { id = id });
+        }
 
-        //        await this.dbContext
-        //            .Products
-        //            .AddAsync(product);
+        [HttpPost]
+        public async Task<IActionResult> Unarchive(int id)
+        {
+            try
+            {
+                await this.catalogService.UnarchiveProduct(id);
 
-        //        await this.dbContext
-        //            .SaveChangesAsync();
+                return this.RedirectToAction(nameof(Edit), new { id = id });
+            }
+            catch (Exception ex)
+            {
+                this.HandleException(ex);
+            }
 
-        //        return RedirectToAction(nameof(Index));
+            return this.RedirectToAction(nameof(Edit), new { id = id });
+        }
 
-        //    }
-
-        //    return this.View(createProductViewModel);
-        //}
-
-        //public async Task<IActionResult> Edit(int id, int? fromPage = 1)
-        //{
-        //    var productExists = await this.dbContext
-        //       .Products
-        //       .AnyAsync(x => x.Id == id);
-
-        //    if (!productExists)
-        //    {
-        //        return this.BadRequest(ProductDoesNotExistMessage);
-        //    }
-
-        //    var editProductViewModel = await this.dbContext
-        //        .Products
-        //        .Where(x => x.Id == id)
-        //        .Select(x => new EditProductViewModel
-        //        {
-        //            Id = x.Id,
-        //            Description = x.Description,
-        //            Name = x.Name,
-        //            Price = x.Price,
-        //            StockAvailable = x.StockAvailable,
-        //            Weight = x.Weight,
-        //            DateAdded = x.DateAdded,
-        //            LastUpdated = x.LastUpdated,
-        //            IsArchived = x.IsArchived,
-        //            FromPageNumber = fromPage.Value,
-        //            PrimaryImageViewModel = new ProductImageViewModel
-        //            {
-        //                Id = x
-        //                      .Images
-        //                      .Where(i => i.IsPrimary)
-        //                      .Select(i => i.Id)
-        //                      .FirstOrDefault(),
-        //                Name = x
-        //                      .Images
-        //                      .Where(i => i.IsPrimary)
-        //                      .Select(i => i.Name)
-        //                      .FirstOrDefault()
-        //            },
-        //            ImageViewModels = x
-        //                .Images
-        //                .Select(i => new ProductImageViewModel
-        //                {
-        //                    Id = i.Id,
-        //                    Name = i.Name
-        //                })
-        //                .ToList()
-        //        })
-        //        .FirstOrDefaultAsync();
-
-        //    return this.View(editProductViewModel);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Edit(EditProductViewModel editProductViewModel)
-        //{
-        //    var productExists = await this.dbContext
-        //       .Products
-        //       .AnyAsync(x => x.Id == editProductViewModel.Id);
-
-        //    if (!productExists)
-        //    {
-        //        return this.BadRequest(ProductDoesNotExistMessage);
-        //    }
-
-        //    if (this.ModelState.IsValid)
-        //    {
-        //        var product = await this.dbContext
-        //            .Products
-        //            .Include(x => x.Images)
-        //            .FirstOrDefaultAsync(x => x.Id == editProductViewModel.Id);
-
-        //        this.mapper.Map(editProductViewModel, product);
-
-        //        this.dbContext
-        //            .Products
-        //            .Update(product);
-
-        //        await this.dbContext
-        //        .SaveChangesAsync();
-
-        //        return this.RedirectToAction(nameof(Index), new { currentPage = editProductViewModel.FromPageNumber });
-        //    }
-
-
-        //    return this.View(editProductViewModel);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Archive(int id)
-        //{
-        //    var product = await this.dbContext
-        //        .Products
-        //        .FindAsync(id);
-
-        //    if (product == null)
-        //    {
-        //        throw new ArgumentException(ProductDoesNotExistMessage);
-        //    }
-
-        //    product.IsArchived = true;
-
-        //    return this.RedirectToAction(nameof(Index));
-        //}
+        private void HandleException(Exception ex)
+        {
+            ViewBag.CatalogInoperativeMsg = $"Catalog Service is inoperative {ex.GetType().Name} - {ex.Message}";
+        }
     }
 }

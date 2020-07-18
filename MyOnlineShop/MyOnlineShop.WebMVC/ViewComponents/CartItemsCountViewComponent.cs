@@ -29,7 +29,7 @@ namespace MyOnlineShop.WebMVC.ViewComponents
 
                 return this.View(cartItemsCount);
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 ViewBag.IsCartInoperative = true;
 

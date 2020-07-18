@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MyOnlineShop.Common.Services;
+using System;
 
 namespace MyOnlineShop.Common.Infrastructure
 {
@@ -33,7 +34,11 @@ namespace MyOnlineShop.Common.Infrastructure
 
         public static IApplicationBuilder Initialize(this IApplicationBuilder app)
         {
-            using var serviceScope = app.ApplicationServices.CreateScope();
+            using var serviceScope = app
+                .ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope();
+
             var serviceProvider = serviceScope.ServiceProvider;
 
             var dbContext = serviceProvider.GetService<DbContext>();

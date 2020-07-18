@@ -10,6 +10,8 @@
 
         public string Description { get; set; }
 
-        public ProductImageViewModel ImageViewModel { get; set; }
+        public string ImageUrl { get; set; }
+
+        public bool IsArchived { get; set; }
     }
 }

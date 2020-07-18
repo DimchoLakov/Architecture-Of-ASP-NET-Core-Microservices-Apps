@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace MyOnlineShop.Ordering.Controllers
 {
+    [Authorize]
     public class OrdersController : ApiController
     {
         private readonly OrderingDbContext dbContext;
@@ -23,18 +24,12 @@ namespace MyOnlineShop.Ordering.Controllers
             this.currentUser = currentUser;
         }
 
-        [Authorize]
         [HttpGet]
-        public async Task<ActionResult<ICollection<OrderIndexViewModel>>> UserOrders()
+        public async Task<ActionResult<ICollection<OrderIndexViewModel>>> UserOrders([FromQuery] string userId)
         {
-            if (string.IsNullOrWhiteSpace(this.currentUser.UserId))
-            {
-                return this.BadRequest();
-            }
-
             var orderIndexViewModels = await this.dbContext
                 .Orders
-                .Where(x => x.UserId == this.currentUser.UserId)
+                .Where(x => x.UserId == userId)
                 .Select(x => new OrderIndexViewModel
                 {
                     Id = x.Id,
@@ -46,16 +41,21 @@ namespace MyOnlineShop.Ordering.Controllers
                 })
                 .ToListAsync();
 
+            if (!orderIndexViewModels.Any())
+            {
+                return this.Ok(new List<OrderIndexViewModel>());
+            }
+
             return this.Ok(orderIndexViewModels);
         }
 
-        [Authorize]
         [HttpGet(Id)]
         public async Task<ActionResult<OrderDetailsViewModel>> Details(int id)
         {
             var orderExists = await this.dbContext
                 .Orders
-                .AnyAsync(x => x.Id == id);
+                .AnyAsync(x => x.Id == id &&
+                               x.UserId == this.currentUser.UserId);
 
             if (!orderExists)
             {
@@ -64,7 +64,8 @@ namespace MyOnlineShop.Ordering.Controllers
 
             var orderDetailsViewModel = await this.dbContext
                 .Orders
-                .Where(x => x.Id == id)
+                .Where(x => x.Id == id &&
+                            x.UserId == this.currentUser.UserId)
                 .Select(x => new OrderDetailsViewModel
                 {
                     Date = x.Date.ToString(DateTimeConstants.DateFullMonthYearHoursMinutesFormat),

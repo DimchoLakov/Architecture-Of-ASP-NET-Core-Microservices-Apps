@@ -8,7 +8,7 @@ namespace MyOnlineShop.WebMVC.Services.Ordering
 {
     public interface IOrderingService
     {
-        [Get("/Orders/{userId}")]
+        [Get("/Orders")]
         Task<ICollection<OrderIndexViewModel>> GetUserOrders([Query] string userId);
 
         [Get("/Orders/{id}")]

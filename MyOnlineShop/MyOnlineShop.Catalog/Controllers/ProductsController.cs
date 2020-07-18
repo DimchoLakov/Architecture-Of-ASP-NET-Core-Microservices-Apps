@@ -1,43 +1,55 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Catalog.Constants;
-using MyOnlineShop.Catalog.Data.Models.Galleries;
 using MyOnlineShop.Catalog.Data.Models.Products;
+using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.Controllers;
+using MyOnlineShop.Common.Services;
 using MyOnlineShop.Common.ViewModels.Pagination;
 using MyOnlineShop.Common.ViewModels.Products;
 using MyOnlineShop.Ordering.Data;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.Catalog.Controllers
 {
+    [Authorize]
     public class ProductsController : ApiController
     {
         private readonly CatalogDbContext dbContext;
+        private readonly ICurrentUserService currentUserService;
         private readonly IMapper mapper;
 
         public ProductsController(
             CatalogDbContext dbContext,
+            ICurrentUserService currentUserService,
             IMapper mapper)
         {
             this.dbContext = dbContext;
+            this.currentUserService = currentUserService;
             this.mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ProductPaginationViewModel>> All([FromQuery] int? currentPage = 1, [FromQuery] string search = null)
+        public async Task<ActionResult<ProductPaginationViewModel>> All(string area, int? currentPage = 1, string search = null)
         {
             int count = 0;
 
             var query = this.dbContext
                 .Products
                 .Where(x => !x.IsArchived);
+
+            if (this.currentUserService.IsAdministrator &&
+                area == AuthConstants.AdminAreaName)
+            {
+                query = this.dbContext
+                .Products;
+            }
+
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query
@@ -90,19 +102,8 @@ namespace MyOnlineShop.Catalog.Controllers
                     Description = x.Description,
                     Name = x.Name,
                     Price = x.Price,
-                    ImageViewModel = new ProductImageViewModel()
-                    {
-                        Id = x
-                        .Images
-                        .Where(i => i.IsPrimary)
-                        .Select(i => i.Id)
-                        .FirstOrDefault(),
-                        Name = x
-                        .Images
-                        .Where(i => i.IsPrimary)
-                        .Select(i => i.Name)
-                        .FirstOrDefault(),
-                    }
+                    ImageUrl = x.ImageUrl,
+                    IsArchived = x.IsArchived
                 })
                 .ToListAsync()
             };
@@ -112,7 +113,7 @@ namespace MyOnlineShop.Catalog.Controllers
 
         [HttpGet]
         [Route(Id)]
-        public async Task<ActionResult<ProductDetailsViewModel>> Details([FromQuery] int id, [FromQuery] int? fromPage = 1)
+        public async Task<ActionResult<ProductDetailsViewModel>> Details(int id, int? fromPage = 1)
         {
             var productExists = await this.dbContext
                 .Products
@@ -135,27 +136,8 @@ namespace MyOnlineShop.Catalog.Controllers
                     StockAvailable = x.StockAvailable,
                     Weight = x.Weight,
                     FromPageNumber = fromPage.Value,
-                    PrimaryImageViewModel = new ProductImageViewModel
-                    {
-                        Id = x
-                              .Images
-                              .Where(i => i.IsPrimary)
-                              .Select(i => i.Id)
-                              .FirstOrDefault(),
-                        Name = x
-                              .Images
-                              .Where(i => i.IsPrimary)
-                              .Select(i => i.Name)
-                              .FirstOrDefault()
-                    },
-                    ImageViewModels = x
-                        .Images
-                        .Select(i => new ProductImageViewModel
-                        {
-                            Id = i.Id,
-                            Name = i.Name
-                        })
-                        .ToList()
+                    ImageUrl = x.ImageUrl,
+                    IsArchived = x.IsArchived
                 })
                 .FirstOrDefaultAsync();
 
@@ -164,12 +146,14 @@ namespace MyOnlineShop.Catalog.Controllers
 
         [HttpGet]
         [Route("[action]")]
+        [Authorize(Roles = AdminConstants.AdministratorRole)]
         public async Task<ActionResult<CreateProductViewModel>> GetCreate()
         {
             var createProductViewModel = new CreateProductViewModel
             {
                 Categories = await this.dbContext
                     .Categories
+                    .Where(x => x.IsActive)
                     .Select(x => new SelectListItem
                     {
                         Text = x.Name,
@@ -182,7 +166,8 @@ namespace MyOnlineShop.Catalog.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(CreateProductViewModel createProductViewModel)
+        [Authorize(Roles = AdminConstants.AdministratorRole)]
+        public async Task<ActionResult> Create([FromBody] CreateProductViewModel createProductViewModel)
         {
             if (this.ModelState.IsValid)
             {
@@ -215,39 +200,6 @@ namespace MyOnlineShop.Catalog.Controllers
                     }
                 }
 
-                if (createProductViewModel.Files.Any())
-                {
-                    var imageTypes = new string[]
-                    {
-                        ".tif", ".tiff", ".bmp", ".jpg", ".jpeg", ".gif", ".png", ".eps", ".raw", ".cr2", ".nef", ".orf", ".sr2"
-                    };
-
-                    var count = 0;
-                    foreach (IFormFile file in createProductViewModel.Files)
-                    {
-                        count++;
-                        string imageExtension = Path.GetExtension(file.FileName);
-                        if (!imageTypes.Contains(imageExtension))
-                        {
-                            return this.BadRequest(string.Format(ImageConstants.ImageTypeNotAllowedMessage, imageExtension));
-                        }
-
-                        var image = new Image
-                        {
-                            Name = file.FileName,
-                            IsPrimary = count == 1,
-                            MimeType = imageExtension
-                        };
-
-                        using var memoryStream = new MemoryStream();
-                        file.CopyTo(memoryStream);
-                        byte[] fileBytes = memoryStream.ToArray();
-                        image.Content = fileBytes;
-
-                        product.Images.Add(image);
-                    }
-                }
-
                 await this.dbContext
                     .Products
                     .AddAsync(product);
@@ -268,7 +220,8 @@ namespace MyOnlineShop.Catalog.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<ActionResult<EditProductViewModel>> GetEdit(int id, int? fromPage = 1)
+        [Authorize(Roles = AdminConstants.AdministratorRole)]
+        public async Task<ActionResult<EditProductViewModel>> GetEdit([FromQuery] int id, [FromQuery] int? fromPage = 1)
         {
             var productExists = await this.dbContext
                .Products
@@ -294,27 +247,7 @@ namespace MyOnlineShop.Catalog.Controllers
                     LastUpdated = x.LastUpdated,
                     IsArchived = x.IsArchived,
                     FromPageNumber = fromPage.Value,
-                    PrimaryImageViewModel = new ProductImageViewModel
-                    {
-                        Id = x
-                              .Images
-                              .Where(i => i.IsPrimary)
-                              .Select(i => i.Id)
-                              .FirstOrDefault(),
-                        Name = x
-                              .Images
-                              .Where(i => i.IsPrimary)
-                              .Select(i => i.Name)
-                              .FirstOrDefault()
-                    },
-                    ImageViewModels = x
-                        .Images
-                        .Select(i => new ProductImageViewModel
-                        {
-                            Id = i.Id,
-                            Name = i.Name
-                        })
-                        .ToList()
+                    ImageUrl = x.ImageUrl
                 })
                 .FirstOrDefaultAsync();
 
@@ -322,6 +255,7 @@ namespace MyOnlineShop.Catalog.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = AdminConstants.AdministratorRole)]
         public async Task<IActionResult> Edit(EditProductViewModel editProductViewModel)
         {
             var productExists = await this.dbContext
@@ -337,7 +271,6 @@ namespace MyOnlineShop.Catalog.Controllers
             {
                 var product = await this.dbContext
                     .Products
-                    .Include(x => x.Images)
                     .FirstOrDefaultAsync(x => x.Id == editProductViewModel.Id);
 
                 this.mapper.Map(editProductViewModel, product);
@@ -362,6 +295,7 @@ namespace MyOnlineShop.Catalog.Controllers
 
         [HttpPost]
         [Route("[action]" + PathSeparator + Id)]
+        [Authorize(Roles = AdminConstants.AdministratorRole)]
         public async Task<ActionResult> Archive(int id)
         {
             var product = await this.dbContext
@@ -374,6 +308,39 @@ namespace MyOnlineShop.Catalog.Controllers
             }
 
             product.IsArchived = true;
+
+            this.dbContext
+                .Products
+                .Update(product);
+
+            await this.dbContext
+                .SaveChangesAsync();
+
+            return this.Ok();
+        }
+
+        [HttpPost]
+        [Route("[action]" + PathSeparator + Id)]
+        [Authorize(Roles = AdminConstants.AdministratorRole)]
+        public async Task<ActionResult> Unarchive(int id)
+        {
+            var product = await this.dbContext
+                .Products
+                .FindAsync(id);
+
+            if (product == null)
+            {
+                return this.BadRequest(ProductConstants.ProductDoesNotExistMessage);
+            }
+
+            product.IsArchived = false;
+
+            this.dbContext
+                .Products
+                .Update(product);
+
+            await this.dbContext
+                .SaveChangesAsync();
 
             return this.Ok();
         }

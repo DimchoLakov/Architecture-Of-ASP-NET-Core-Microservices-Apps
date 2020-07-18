@@ -6,11 +6,6 @@ namespace MyOnlineShop.Common.ViewModels.Products
 {
     public class EditProductViewModel
     {
-        public EditProductViewModel()
-        {
-            this.ImageViewModels = new List<ProductImageViewModel>();
-        }
-
         public int Id { get; set; }
 
         [Display(Name = "Product Name: ")]
@@ -36,6 +31,11 @@ namespace MyOnlineShop.Common.ViewModels.Products
         [Required]
         public string Description { get; set; }
 
+        [Display(Name = "Image")]
+        [DataType(DataType.Url)]
+        [Required]
+        public string ImageUrl { get; set; }
+
         public DateTime DateAdded { get; set; }
 
         public DateTime LastUpdated { get; set; }
@@ -43,9 +43,5 @@ namespace MyOnlineShop.Common.ViewModels.Products
         public bool IsArchived { get; set; }
 
         public int FromPageNumber { get; set; }
-
-        public ProductImageViewModel PrimaryImageViewModel { get; set; }
-
-        public ICollection<ProductImageViewModel> ImageViewModels { get; set; }
     }
 }

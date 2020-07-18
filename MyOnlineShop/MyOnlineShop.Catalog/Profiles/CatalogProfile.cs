@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MyOnlineShop.Catalog.Data.Models.Categories;
 using MyOnlineShop.Catalog.Data.Models.Customers;
-using MyOnlineShop.Catalog.Data.Models.Galleries;
 using MyOnlineShop.Catalog.Data.Models.Products;
 using MyOnlineShop.Common.ViewModels.Addresses;
 using MyOnlineShop.Common.ViewModels.Categories;
@@ -15,8 +14,6 @@ namespace MyOnlineShop.Catalog.Profiles
         public CatalogProfile()
         {
             this.CreateMap<Product, ProductIndexViewModel>();
-
-            this.CreateMap<Image, ProductImageViewModel>();
 
             this.CreateMap<CreateProductViewModel, Product>()
                 .ForMember(dest => dest.ProductCategories, opts => opts.Ignore())
@@ -37,8 +34,6 @@ namespace MyOnlineShop.Catalog.Profiles
             this.CreateMap<AddCategoryViewModel, Category>();
 
             this.CreateMap<Product, ProductIndexViewModel>();
-
-            this.CreateMap<Image, ProductImageViewModel>();
 
             this.CreateMap<CreateProductViewModel, Product>()
                 .ForMember(dest => dest.ProductCategories, opts => opts.Ignore())

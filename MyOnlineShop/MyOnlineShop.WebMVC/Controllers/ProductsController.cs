@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyOnlineShop.WebMVC.Services.Catalog;
 using System;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC.Controllers
 {
+    [Authorize]
     public class ProductsController : Controller
     {
         private readonly ICatalogService catalogService;
@@ -18,7 +20,7 @@ namespace MyOnlineShop.WebMVC.Controllers
         {
             try
             {
-                var productPaginationViewModel = await this.catalogService.GetProductPagination(currentPage, search);
+                var productPaginationViewModel = await this.catalogService.GetProductPagination(string.Empty, currentPage, search);
 
                 return this.View(productPaginationViewModel);
             }
