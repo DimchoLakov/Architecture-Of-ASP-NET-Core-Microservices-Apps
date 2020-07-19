@@ -22,19 +22,22 @@ namespace MyOnlineShop.WebMVC.Controllers
         private readonly ICatalogService catalogService;
         private readonly IOrderingService orderingService;
         private readonly ICurrentUserService currentUserService;
+        private readonly IShoppingCartGatewayService shoppingCartGatewayService;
 
         public ShoppingCartsController(
             IMapper mapper,
             IShoppingCartService shoppingCartService,
             ICatalogService catalogService,
             IOrderingService orderingService,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IShoppingCartGatewayService shoppingCartGatewayService)
         {
             this.mapper = mapper;
             this.shoppingCartService = shoppingCartService;
             this.catalogService = catalogService;
             this.orderingService = orderingService;
             this.currentUserService = currentUserService;
+            this.shoppingCartGatewayService = shoppingCartGatewayService;
         }
 
         public async Task<IActionResult> Index()
@@ -112,12 +115,7 @@ namespace MyOnlineShop.WebMVC.Controllers
         {
             try
             {
-                var shoppingCartOrderWrapperViewModel = new ShoppingCartOrderWrapperViewModel
-                {
-                    OrderAddressViewModel = this.mapper.Map<AddressViewModel, OrderAddressViewModel>(
-                                                       await this.catalogService.GetAddress(this.currentUserService.UserId)),
-                    ShoppingCartViewModel = await this.shoppingCartService.GetShoppingCart(this.currentUserService.UserId)
-                };
+                var shoppingCartOrderWrapperViewModel = await this.shoppingCartGatewayService.GetCheckout();
 
                 return this.View(shoppingCartOrderWrapperViewModel);
             }
@@ -134,20 +132,7 @@ namespace MyOnlineShop.WebMVC.Controllers
         {
             try
             {
-                var shoppingCartViewModel = await this.shoppingCartService.GetShoppingCart(this.currentUserService.UserId);
-
-                if (orderAddressViewModel.IsAddressAvailable)
-                {
-                    await this.orderingService.PlaceOrder(this.currentUserService.UserId, orderAddressViewModel.Id, shoppingCartViewModel.CartItemViewModels);
-                }
-                else
-                {
-                    var addressId = await this.catalogService.CreateAddress(this.currentUserService.UserId, orderAddressViewModel);
-
-                    await this.orderingService.PlaceOrder(this.currentUserService.UserId, addressId, shoppingCartViewModel.CartItemViewModels);
-                }
-
-                await this.shoppingCartService.Clear(this.currentUserService.UserId);
+                await this.shoppingCartGatewayService.Checkout(orderAddressViewModel);
 
                 return this.RedirectToAction(nameof(Success));
             }

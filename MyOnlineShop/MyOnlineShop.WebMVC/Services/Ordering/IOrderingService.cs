@@ -13,8 +13,5 @@ namespace MyOnlineShop.WebMVC.Services.Ordering
 
         [Get("/Orders/{id}")]
         Task<OrderDetailsViewModel> Details(int id);
-
-        [Post("/Orders")]
-        Task PlaceOrder([Query] string userId, [Query] int addressId, [Body] IEnumerable<CartItemViewModel> cartItemViewModels);
     }
 }

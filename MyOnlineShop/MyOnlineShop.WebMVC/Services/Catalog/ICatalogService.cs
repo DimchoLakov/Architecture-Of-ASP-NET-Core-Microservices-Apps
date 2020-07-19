@@ -34,12 +34,6 @@ namespace MyOnlineShop.WebMVC.Services.Catalog
         [Post("/Products/Unarchive/{id}")]
         Task UnarchiveProduct(int id);
 
-        [Get("/Addresses/{userId}")]
-        Task<AddressViewModel> GetAddress(string userId);
-
-        [Post("/Addresses")]
-        Task<int> CreateAddress([Query] string userId, OrderAddressViewModel orderAddressViewModel);
-
         [Get("/Categories")]
         Task<IEnumerable<CategoryIndexViewModel>> GetCategories();
 

@@ -54,11 +54,11 @@ namespace MyOnlineShop.WebMVC.Admin
             {
                 options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
             })
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.Formatting = Formatting.Indented;
-                });
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.Formatting = Formatting.Indented;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -88,7 +88,7 @@ namespace MyOnlineShop.WebMVC.Admin
                     }
                 }))
                 .UseRouting()
-                .UseJwtHeaderAuthentication()
+                .UseJwtCookieAuthentication()
                 .UseAuthorization()
                 .UseEndpoints(endpoints =>
                 {

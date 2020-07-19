@@ -7,34 +7,32 @@ using System.Threading.Tasks;
 
 namespace MyOnlineShop.Common.Infrastructure
 {
-    public class JwtCookieAuthenticationMiddleware : IMiddleware
+    public class JwtHeaderAuthenticationMiddleware : IMiddleware
     {
         private readonly ICurrentTokenService currentToken;
 
-        public JwtCookieAuthenticationMiddleware(ICurrentTokenService currentToken)
+        public JwtHeaderAuthenticationMiddleware(ICurrentTokenService currentToken)
             => this.currentToken = currentToken;
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var token = context.Request.Cookies[AuthConstants.AuthenticationCookieName];
+            var token = context.Request.Headers[AuthConstants.AuthorizationHeaderName].ToString();
 
             if (!string.IsNullOrWhiteSpace(token))
             {
                 this.currentToken.Set(token.Split().Last());
-
-                context.Request.Headers.Append(AuthConstants.AuthorizationHeaderName, $"{AuthConstants.AuthorizationHeaderValuePrefix} {token}");
             }
 
             await next.Invoke(context);
         }
     }
 
-    public static class JwtCookieAuthenticationMiddlewareExtensions
+    public static class JwtHeaderAuthenticationMiddlewareExtensions
     {
-        public static IApplicationBuilder UseJwtCookieAuthentication(
+        public static IApplicationBuilder UseJwtHeaderAuthentication(
             this IApplicationBuilder app)
             => app
-                .UseMiddleware<JwtCookieAuthenticationMiddleware>()
+                .UseMiddleware<JwtHeaderAuthenticationMiddleware>()
                 .UseAuthentication();
     }
 }

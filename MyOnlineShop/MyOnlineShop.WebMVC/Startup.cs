@@ -58,6 +58,10 @@ namespace MyOnlineShop.WebMVC
                 .WithConfiguration(serviceEndpoints.ShoppingCart);
 
             services
+                .AddRefitClient<IShoppingCartGatewayService>()
+                .WithConfiguration(serviceEndpoints.ShoppingCartGateway);
+            
+            services
              .AddRefitClient<ICatalogService>()
              .WithConfiguration(serviceEndpoints.Catalog);
 
@@ -66,11 +70,11 @@ namespace MyOnlineShop.WebMVC
             {
                 options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
             })
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.Formatting = Formatting.Indented;
-                });
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.Formatting = Formatting.Indented;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -100,7 +104,7 @@ namespace MyOnlineShop.WebMVC
                     }
                 }))
                 .UseRouting()
-                .UseJwtHeaderAuthentication()
+                .UseJwtCookieAuthentication()
                 .UseAuthorization()
                 .UseEndpoints(endpoints =>
                 {
