@@ -10,8 +10,6 @@ using MyOnlineShop.Common.Services;
 using MyOnlineShop.WebMVC.Admin.Services;
 using MyOnlineShop.WebMVC.Admin.Services.Catalog;
 using MyOnlineShop.WebMVC.Admin.Services.Identity;
-using MyOnlineShop.WebMVC.Admin.Services.Ordering;
-using MyOnlineShop.WebMVC.Admin.Services.ShoppingCart;
 using Newtonsoft.Json;
 using Refit;
 using System.Net;
@@ -46,14 +44,6 @@ namespace MyOnlineShop.WebMVC.Admin
             services
                 .AddRefitClient<IIdentityService>()
                 .WithConfiguration(serviceEndpoints.Identity);
-
-            services
-                .AddRefitClient<IOrderingService>()
-                .WithConfiguration(serviceEndpoints.Ordering);
-
-            services
-                .AddRefitClient<IShoppingCartService>()
-                .WithConfiguration(serviceEndpoints.ShoppingCart);
 
             services
              .AddRefitClient<ICatalogService>()
