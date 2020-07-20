@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyOnlineShop.Common.Infrastructure;
 using MyOnlineShop.Ordering.Data;
+using MyOnlineShop.ShoppingCart.Messages;
 using System.Reflection;
 
 namespace MyOnlineShop.ShoppingCart
@@ -22,7 +23,8 @@ namespace MyOnlineShop.ShoppingCart
         {
             services
                 .AddWebService<ShoppingCartDbContext>(this.Configuration)
-                .AddAutoMapper(Assembly.GetExecutingAssembly());
+                .AddAutoMapper(Assembly.GetExecutingAssembly())
+                .AddMessaging(typeof(ProductUpdatedConsumer), typeof(ProductArchivedConsumer));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

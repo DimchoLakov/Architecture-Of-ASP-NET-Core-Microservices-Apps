@@ -18,33 +18,20 @@ namespace MyOnlineShop.Catalog.Profiles
 
             this.CreateMap<CreateProductViewModel, Product>()
                 .ForMember(dest => dest.ProductCategories, opts => opts.Ignore())
-                .ForMember(dest => dest.DateAdded, opts => opts.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.LastUpdated, opts => opts.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.DateAdded, opts => opts.MapFrom(src => DateTime.Now))
+                .ForMember(dest => dest.LastUpdated, opts => opts.MapFrom(src => DateTime.Now))
                 .ReverseMap();
 
             this.CreateMap<EditProductViewModel, Product>()
                 .ForMember(dest => dest.ProductCategories, opts => opts.Ignore())
                 .ForMember(dest => dest.DateAdded, opts => opts.Ignore())
-                .ForMember(dest => dest.LastUpdated, opts => opts.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.LastUpdated, opts => opts.MapFrom(src => DateTime.Now))
+                .ForMember(dest => dest.IsArchived, opts => opts.Ignore())
                 .ReverseMap();
 
             this.CreateMap<AddCategoryViewModel, Category>();
 
             this.CreateMap<Address, AddressViewModel>();
-
-            this.CreateMap<AddCategoryViewModel, Category>();
-
-            this.CreateMap<Product, ProductIndexViewModel>();
-
-            this.CreateMap<CreateProductViewModel, Product>()
-                .ForMember(dest => dest.ProductCategories, opts => opts.Ignore())
-                .ForMember(dest => dest.DateAdded, opts => opts.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.LastUpdated, opts => opts.MapFrom(src => DateTime.UtcNow));
-
-            this.CreateMap<EditProductViewModel, Product>()
-                .ForMember(dest => dest.ProductCategories, opts => opts.Ignore())
-                .ForMember(dest => dest.DateAdded, opts => opts.Ignore())
-                .ForMember(dest => dest.LastUpdated, opts => opts.MapFrom(src => DateTime.UtcNow));
 
             this.CreateMap<OrderAddressViewModel, Address>()
                 .ForMember(dest => dest.IsDeliveryAddress, opts => opts.Ignore())

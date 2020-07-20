@@ -10,6 +10,7 @@ using MyOnlineShop.Common.Services;
 using MyOnlineShop.WebMVC.Admin.Services;
 using MyOnlineShop.WebMVC.Admin.Services.Catalog;
 using MyOnlineShop.WebMVC.Admin.Services.Identity;
+using MyOnlineShop.WebMVC.Admin.Services.Statistics;
 using Newtonsoft.Json;
 using Refit;
 using System.Net;
@@ -46,8 +47,12 @@ namespace MyOnlineShop.WebMVC.Admin
                 .WithConfiguration(serviceEndpoints.Identity);
 
             services
-             .AddRefitClient<ICatalogService>()
-             .WithConfiguration(serviceEndpoints.Catalog);
+                .AddRefitClient<ICatalogService>()
+                .WithConfiguration(serviceEndpoints.Catalog);
+
+            services
+                .AddRefitClient<IStatisticsService>()
+                .WithConfiguration(serviceEndpoints.Statistics);
 
             services.AddRazorPages();
             services.AddControllersWithViews(options =>

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,6 +8,7 @@ using MyOnlineShop.Catalog.Constants;
 using MyOnlineShop.Catalog.Data.Models.Products;
 using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.Controllers;
+using MyOnlineShop.Common.Messages.Catalog;
 using MyOnlineShop.Common.Services;
 using MyOnlineShop.Common.ViewModels.Pagination;
 using MyOnlineShop.Common.ViewModels.Products;
@@ -23,15 +25,18 @@ namespace MyOnlineShop.Catalog.Controllers
         private readonly CatalogDbContext dbContext;
         private readonly ICurrentUserService currentUserService;
         private readonly IMapper mapper;
+        private readonly IBus publisher;
 
         public ProductsController(
             CatalogDbContext dbContext,
             ICurrentUserService currentUserService,
-            IMapper mapper)
+            IMapper mapper,
+            IBus publisher)
         {
             this.dbContext = dbContext;
             this.currentUserService = currentUserService;
             this.mapper = mapper;
+            this.publisher = publisher;
         }
 
         [HttpGet]
@@ -211,6 +216,11 @@ namespace MyOnlineShop.Catalog.Controllers
                 await this.dbContext
                     .SaveChangesAsync();
 
+                await this.publisher.Publish(new ProductAddedMessage
+                {
+                    Name = createProductViewModel.Name
+                });
+
                 return this.Ok();
             }
 
@@ -288,6 +298,16 @@ namespace MyOnlineShop.Catalog.Controllers
                 await this.dbContext
                 .SaveChangesAsync();
 
+                await this.publisher.Publish(new ProductUpdatedMessage
+                {
+                    ProductId = editProductViewModel.Id,
+                    Description = editProductViewModel.Description,
+                    ImageUrl = editProductViewModel.ImageUrl,
+                    Name = editProductViewModel.Name,
+                    Price = editProductViewModel.Price,
+                    Weight = editProductViewModel.Weight
+                });
+
                 return this.Ok();
             }
 
@@ -322,6 +342,12 @@ namespace MyOnlineShop.Catalog.Controllers
             await this.dbContext
                 .SaveChangesAsync();
 
+            await this.publisher.Publish(new ProductArchivedMessage
+            {
+                Id = id,
+                IsArchived = true
+            });
+
             return this.Ok();
         }
 
@@ -347,6 +373,12 @@ namespace MyOnlineShop.Catalog.Controllers
 
             await this.dbContext
                 .SaveChangesAsync();
+
+            await this.publisher.Publish(new ProductArchivedMessage
+            {
+                Id = id,
+                IsArchived = false
+            });
 
             return this.Ok();
         }

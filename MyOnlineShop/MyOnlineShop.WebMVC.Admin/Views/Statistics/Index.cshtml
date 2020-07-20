@@ -1,0 +1,16 @@
+﻿@model StatisticsViewModel
+
+@{
+    ViewData["Title"] = "Statistics";
+}
+
+<div class="row text-center">
+    <div class="col-md-4 offset-md-2">
+        <h3>Total Products</h3>
+        <h1>@Model.TotalProducts</h1>
+    </div>
+    <div class="col-md-4">
+        <h3>Total Sales</h3>
+        <h1>@Model.TotalSales</h1>
+    </div>
+</div>

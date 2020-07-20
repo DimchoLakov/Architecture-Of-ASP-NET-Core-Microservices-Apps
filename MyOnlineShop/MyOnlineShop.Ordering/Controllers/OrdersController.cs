@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.Controllers;
+using MyOnlineShop.Common.Messages.Ordering;
 using MyOnlineShop.Common.Services;
 using MyOnlineShop.Common.ViewModels.Orders;
 using MyOnlineShop.Common.ViewModels.ShoppingCarts;
@@ -23,15 +25,18 @@ namespace MyOnlineShop.Ordering.Controllers
         private readonly OrderingDbContext orderingDbContext;
         private readonly ICurrentUserService currentUser;
         private readonly IMapper mapper;
+        private readonly IBus publisher;
 
         public OrdersController(
             OrderingDbContext dbContext, 
             ICurrentUserService currentUser,
-            IMapper mapper)
+            IMapper mapper,
+            IBus publisher)
         {
             this.orderingDbContext = dbContext;
             this.currentUser = currentUser;
             this.mapper = mapper;
+            this.publisher = publisher;
         }
 
         [HttpGet]
@@ -120,6 +125,11 @@ namespace MyOnlineShop.Ordering.Controllers
 
             await this.orderingDbContext
                 .SaveChangesAsync();
+
+            await this.publisher.Publish(new OrderPlacedMessage
+            {
+                UserId = userId
+            });
 
             return this.Ok();
         }

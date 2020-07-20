@@ -34,7 +34,8 @@ namespace MyOnlineShop.ShoppingCart.Controllers
             return await this.shoppingCartDbContext
                 .ShoppingCartItems
                 .Include(x => x.ShoppingCart)
-                .Where(x => x.ShoppingCart.UserId == userId)
+                .Where(x => x.ShoppingCart.UserId == userId &&
+                            !x.IsArchived)
                 .CountAsync();
         }
 
@@ -49,6 +50,7 @@ namespace MyOnlineShop.ShoppingCart.Controllers
                 {
                     CartItemViewModels = x
                                           .CartItems
+                                          .Where(x => !x.IsArchived)
                                           .Select(ci => new CartItemViewModel
                                           {
                                               ProductId = ci.ProductId,

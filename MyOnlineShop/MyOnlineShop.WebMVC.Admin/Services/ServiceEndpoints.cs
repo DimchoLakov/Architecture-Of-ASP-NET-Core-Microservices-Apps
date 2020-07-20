@@ -9,5 +9,7 @@
         public string Ordering { get; set; }
 
         public string ShoppingCart { get; set; }
+
+        public string Statistics { get; set; }
     }
 }

@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MyOnlineShop.Catalog.DataSeed;
-using MyOnlineShop.Catalog.Filters;
 using MyOnlineShop.Common.Infrastructure;
 using MyOnlineShop.Common.Services;
-using MyOnlineShop.Ordering.Data;
+using MyOnlineShop.Statistics.Data;
+using MyOnlineShop.Statistics.DataSeed;
+using MyOnlineShop.Statistics.Messages;
 using System.Reflection;
 
-namespace MyOnlineShop.Catalog
+namespace MyOnlineShop.Statistics
 {
     public class Startup
     {
@@ -24,11 +24,10 @@ namespace MyOnlineShop.Catalog
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddWebService<CatalogDbContext>(this.Configuration)
-                .AddTransient<IDataSeeder, CatalogDataSeeder>()
-                .AddScoped<AddCustomerActionFilter>()
+                .AddWebService<StatisticsDbContext>(this.Configuration)
                 .AddAutoMapper(Assembly.GetExecutingAssembly())
-                .AddMessaging();
+                .AddTransient<IDataSeeder, StatisticsDataSeeder>()
+                .AddMessaging(typeof(ProductCreatedConsumer), typeof(OrderPlacedConsumer));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
