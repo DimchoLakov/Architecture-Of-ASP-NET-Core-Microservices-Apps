@@ -58,7 +58,6 @@ services:
         environment:
             - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopCatalog;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
         restart: on-failure
-        restart: on-failure
         volumes:
             - ./.aspnet/catalog/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
         networks: 
