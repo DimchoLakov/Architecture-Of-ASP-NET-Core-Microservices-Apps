@@ -133,8 +133,6 @@ services:
             - ./.aspnet/shoppingcartgateway/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
         networks: 
             - myonlineshop-network
-        depends_on:
-            - data
 
     webmvc:
         container_name: webmvc
@@ -149,8 +147,6 @@ services:
             - ./.aspnet/webmvc/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
         networks: 
             - myonlineshop-network
-        depends_on:
-            - data
 
     webmvcadmin:
         container_name: webmvcadmin
@@ -165,8 +161,6 @@ services:
             - ./.aspnet/webmvcadmin/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
         networks: 
             - myonlineshop-network
-        depends_on:
-            - data
 
 networks:
     myonlineshop-network:

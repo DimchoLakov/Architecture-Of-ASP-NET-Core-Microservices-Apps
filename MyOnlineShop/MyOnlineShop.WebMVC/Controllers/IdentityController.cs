@@ -68,7 +68,7 @@ namespace MyOnlineShop.WebMVC.Controllers
                                 new CookieOptions
                                 {
                                     HttpOnly = true,
-                                    Secure = true,
+                                    Secure = false,
                                     MaxAge = TimeSpan.FromDays(1)
                                 });
 
@@ -118,7 +118,7 @@ namespace MyOnlineShop.WebMVC.Controllers
                            new CookieOptions
                            {
                                HttpOnly = true,
-                               Secure = true,
+                               Secure = false,
                                MaxAge = TimeSpan.FromDays(1)
                            });
 

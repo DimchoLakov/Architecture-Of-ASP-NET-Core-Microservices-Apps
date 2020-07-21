@@ -77,19 +77,6 @@ namespace MyOnlineShop.ShoppingCart.Gateway
                 .UseAuthorization()
                 .UseEndpoints(endpoints => endpoints
                     .MapControllers());
-
-            //app.UseHttpsRedirection();
-
-            //app.UseRouting();
-
-            //app.UseJwtHeaderAuthentication();
-
-            //app.UseAuthorization();
-
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapControllers();
-            //});
         }
     }
 }

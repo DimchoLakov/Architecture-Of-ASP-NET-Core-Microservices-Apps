@@ -102,6 +102,12 @@ namespace MyOnlineShop.WebMVC
                     {
                         response.Redirect("/Identity/Login");
                     }
+
+                    if (response.StatusCode == (int)HttpStatusCode.BadRequest ||
+                        response.StatusCode == (int)HttpStatusCode.NotFound)
+                    {
+                        response.Redirect("/Home/Error");
+                    }
                 }))
                 .UseRouting()
                 .UseJwtCookieAuthentication()
@@ -112,8 +118,6 @@ namespace MyOnlineShop.WebMVC
                         name: "default",
                         pattern: "{controller=Products}/{action=Index}/{id?}");
                 });
-
-            //app.UseStatusCodePagesWithReExecute("/Home/Error/", "?/StatusCode={0}");
         }
     }
 }
