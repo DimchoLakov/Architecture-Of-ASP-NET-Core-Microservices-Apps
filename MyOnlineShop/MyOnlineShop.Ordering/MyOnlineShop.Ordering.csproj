@@ -2,20 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>4a5e1ded-7cbe-4a8f-a028-5a291764ba7f</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Data\Migrations\20200717012123_InitialTablesCreate.cs" />
-    <Compile Remove="Data\Migrations\20200717012123_InitialTablesCreate.Designer.cs" />
-    <Compile Remove="Data\Migrations\20200718213619_ChangeProductDescriptionToString.cs" />
-    <Compile Remove="Data\Migrations\20200718213619_ChangeProductDescriptionToString.Designer.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
   </ItemGroup>
 
   <ItemGroup>
