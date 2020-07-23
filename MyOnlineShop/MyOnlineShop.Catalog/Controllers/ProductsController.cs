@@ -216,9 +216,14 @@ namespace MyOnlineShop.Catalog.Controllers
                 await this.dbContext
                     .SaveChangesAsync();
 
+                var totalProductsCount = await this.dbContext
+                    .Products
+                    .CountAsync();
+
                 await this.publisher.Publish(new ProductAddedMessage
                 {
-                    Name = createProductViewModel.Name
+                    Name = createProductViewModel.Name,
+                    Total = totalProductsCount
                 });
 
                 return this.Ok();

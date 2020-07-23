@@ -126,9 +126,14 @@ namespace MyOnlineShop.Ordering.Controllers
             await this.orderingDbContext
                 .SaveChangesAsync();
 
+            var totalOrdersCount = await this.orderingDbContext
+                .Orders
+                .CountAsync();
+
             await this.publisher.Publish(new OrderPlacedMessage
             {
-                UserId = userId
+                UserId = userId,
+                Total = totalOrdersCount
             });
 
             return this.Ok();

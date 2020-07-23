@@ -24,7 +24,7 @@
 
             if (statistics != null)
             {
-                statistics.TotalProducts++;
+                statistics.TotalProducts = context.Message.Total;
 
                 this.dbContext
                     .Statistics
@@ -37,7 +37,7 @@
             {
                 var newStatistics = new Statistics
                 {
-                    TotalProducts = 1,
+                    TotalProducts =  context.Message.Total,
                     TotalSales = 0
                 };
 
