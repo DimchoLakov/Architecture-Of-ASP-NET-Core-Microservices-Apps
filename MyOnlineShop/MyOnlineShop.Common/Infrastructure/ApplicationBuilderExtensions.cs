@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MyOnlineShop.Common.Services;
 using System;
+using Hangfire;
+using MyOnlineShop.Common.Messages;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 
 namespace MyOnlineShop.Common.Infrastructure
 {
@@ -26,8 +30,21 @@ namespace MyOnlineShop.Common.Infrastructure
                     .AllowAnyMethod())
                 .UseAuthentication()
                 .UseAuthorization()
-                .UseEndpoints(endpoints => endpoints
-                    .MapControllers());
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapHealthChecks("/health", new HealthCheckOptions
+                    {
+                        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                    });
+
+                    endpoints.MapControllers();
+                });
+
+            if (app.ApplicationServices.GetService<MessagesHostedService>() != null)
+            {
+                app.UseHangfireServer();
+                app.UseHangfireDashboard();
+            }
 
             return app;
         }

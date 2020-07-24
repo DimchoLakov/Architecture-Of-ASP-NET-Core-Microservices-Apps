@@ -23,7 +23,7 @@ namespace MyOnlineShop.Ordering
             services
                 .AddWebService<OrderingDbContext>(this.Configuration)
                 .AddAutoMapper(Assembly.GetExecutingAssembly())
-                .AddMessaging();
+                .AddMessaging(this.Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

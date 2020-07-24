@@ -27,7 +27,7 @@ namespace MyOnlineShop.Statistics
                 .AddWebService<StatisticsDbContext>(this.Configuration)
                 .AddAutoMapper(Assembly.GetExecutingAssembly())
                 .AddTransient<IDataSeeder, StatisticsDataSeeder>()
-                .AddMessaging(typeof(ProductCreatedConsumer), typeof(OrderPlacedConsumer));
+                .AddMessaging(this.Configuration, typeof(ProductCreatedConsumer), typeof(OrderPlacedConsumer));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -161,6 +161,20 @@ services:
         networks: 
             - myonlineshop-network
 
+    watchdog:
+        container_name: watchdog
+        build:
+            context: ./
+            dockerfile: ./MyOnlineShop.Watchdog/Dockerfile
+        ports: 
+            - "5025:80"
+        env_file: ./MyOnlineShop.Common/Common.env
+        restart: on-failure
+        volumes:
+            - ./.aspnet/watchdog/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+        networks: 
+            - myonlineshop-network
+
 networks:
     myonlineshop-network:
 

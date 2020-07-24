@@ -8,6 +8,7 @@ using MyOnlineShop.Catalog.Constants;
 using MyOnlineShop.Catalog.Data.Models.Products;
 using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.Controllers;
+using MyOnlineShop.Common.Data.Models;
 using MyOnlineShop.Common.Messages.Catalog;
 using MyOnlineShop.Common.Services;
 using MyOnlineShop.Common.ViewModels.Pagination;
@@ -209,6 +210,22 @@ namespace MyOnlineShop.Catalog.Controllers
                     }
                 }
 
+                var totalProductsCount = await this.dbContext
+                    .Products
+                    .CountAsync();
+
+                var messageData = new ProductAddedMessage
+                {
+                    Name = createProductViewModel.Name,
+                    Total = totalProductsCount + 1
+                };
+
+                var message = new Message(messageData);
+
+                await this.dbContext
+                    .Messages
+                    .AddAsync(message);
+
                 await this.dbContext
                     .Products
                     .AddAsync(product);
@@ -216,15 +233,16 @@ namespace MyOnlineShop.Catalog.Controllers
                 await this.dbContext
                     .SaveChangesAsync();
 
-                var totalProductsCount = await this.dbContext
-                    .Products
-                    .CountAsync();
+                await this.publisher.Publish(messageData);
 
-                await this.publisher.Publish(new ProductAddedMessage
-                {
-                    Name = createProductViewModel.Name,
-                    Total = totalProductsCount
-                });
+                var msg = await this.dbContext
+                    .Messages
+                    .FindAsync(message.Id);
+
+                msg.MarkAsPublished();
+
+                await this.dbContext
+                    .SaveChangesAsync();
 
                 return this.Ok();
             }
@@ -296,14 +314,8 @@ namespace MyOnlineShop.Catalog.Controllers
 
                 product.LastUpdated = DateTime.Now;
 
-                this.dbContext
-                    .Products
-                    .Update(product);
 
-                await this.dbContext
-                .SaveChangesAsync();
-
-                await this.publisher.Publish(new ProductUpdatedMessage
+                var messageData = new ProductUpdatedMessage
                 {
                     ProductId = editProductViewModel.Id,
                     Description = editProductViewModel.Description,
@@ -311,7 +323,31 @@ namespace MyOnlineShop.Catalog.Controllers
                     Name = editProductViewModel.Name,
                     Price = editProductViewModel.Price,
                     Weight = editProductViewModel.Weight
-                });
+                };
+
+                var message = new Message(messageData);
+
+                await this.dbContext
+                    .Messages
+                    .AddAsync(message);
+
+                this.dbContext
+                    .Products
+                    .Update(product);
+
+                await this.dbContext
+                .SaveChangesAsync();
+
+                var msg = await this.dbContext
+                    .Messages
+                    .FindAsync(message.Id);
+
+                await this.publisher.Publish(messageData);
+
+                msg.MarkAsPublished();
+
+                await this.dbContext
+                    .SaveChangesAsync();
 
                 return this.Ok();
             }
@@ -340,6 +376,18 @@ namespace MyOnlineShop.Catalog.Controllers
 
             product.IsArchived = true;
 
+            var messageData = new ProductArchivedMessage
+            {
+                Id = id,
+                IsArchived = true
+            };
+
+            var message = new Message(messageData);
+
+            await this.dbContext
+                .Messages
+                .AddAsync(message);
+
             this.dbContext
                 .Products
                 .Update(product);
@@ -347,11 +395,12 @@ namespace MyOnlineShop.Catalog.Controllers
             await this.dbContext
                 .SaveChangesAsync();
 
-            await this.publisher.Publish(new ProductArchivedMessage
-            {
-                Id = id,
-                IsArchived = true
-            });
+            await this.publisher.Publish(messageData);
+
+            message.MarkAsPublished();
+
+            await this.dbContext
+                            .SaveChangesAsync();
 
             return this.Ok();
         }
@@ -372,6 +421,18 @@ namespace MyOnlineShop.Catalog.Controllers
 
             product.IsArchived = false;
 
+            var messageData = new ProductArchivedMessage
+            {
+                Id = id,
+                IsArchived = false
+            };
+
+            var message = new Message(messageData);
+
+            await this.dbContext
+                .Messages
+                .AddAsync(message);
+
             this.dbContext
                 .Products
                 .Update(product);
@@ -379,11 +440,16 @@ namespace MyOnlineShop.Catalog.Controllers
             await this.dbContext
                 .SaveChangesAsync();
 
-            await this.publisher.Publish(new ProductArchivedMessage
-            {
-                Id = id,
-                IsArchived = false
-            });
+            var msg = await this.dbContext
+                .Messages
+                .FindAsync(message.Id);
+
+            await this.publisher.Publish(messageData);
+
+            msg.MarkAsPublished();
+
+            await this.dbContext
+                .SaveChangesAsync();
 
             return this.Ok();
         }

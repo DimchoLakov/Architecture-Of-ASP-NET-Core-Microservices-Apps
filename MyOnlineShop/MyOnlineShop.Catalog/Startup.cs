@@ -28,7 +28,7 @@ namespace MyOnlineShop.Catalog
                 .AddTransient<IDataSeeder, CatalogDataSeeder>()
                 .AddScoped<AddCustomerActionFilter>()
                 .AddAutoMapper(Assembly.GetExecutingAssembly())
-                .AddMessaging();
+                .AddMessaging(this.Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

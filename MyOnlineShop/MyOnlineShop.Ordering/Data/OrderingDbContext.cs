@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyOnlineShop.Common.Data;
 using MyOnlineShop.Ordering.Data.Models.Orders;
 using System.Reflection;
 
 namespace MyOnlineShop.Ordering.Data
 {
-    public class OrderingDbContext : DbContext
+    public class OrderingDbContext : MessageDbContext
     {
         public OrderingDbContext(DbContextOptions<OrderingDbContext> options) 
             : base(options)
@@ -14,6 +15,8 @@ namespace MyOnlineShop.Ordering.Data
         public DbSet<Order> Orders { get; set; }
 
         public DbSet<OrderItem> OrderItems { get; set; }
+
+        protected override Assembly ConfigurationsAssembly => Assembly.GetExecutingAssembly();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

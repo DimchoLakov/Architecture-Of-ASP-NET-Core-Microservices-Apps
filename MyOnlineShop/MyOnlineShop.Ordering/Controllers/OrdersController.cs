@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.Controllers;
+using MyOnlineShop.Common.Data.Models;
 using MyOnlineShop.Common.Messages.Ordering;
 using MyOnlineShop.Common.Services;
 using MyOnlineShop.Common.ViewModels.Orders;
@@ -119,6 +120,22 @@ namespace MyOnlineShop.Ordering.Controllers
                 UserId = userId
             };
 
+            var totalOrdersCount = await this.orderingDbContext
+                .Orders
+                .CountAsync();
+
+            var messageData = new OrderPlacedMessage
+            {
+                UserId = userId,
+                Total = totalOrdersCount + 1
+            };
+
+            var message = new Message(messageData);
+
+            await this.orderingDbContext
+                .Messages
+                .AddAsync(message);
+
             await this.orderingDbContext
                 .Orders
                 .AddAsync(order);
@@ -126,15 +143,16 @@ namespace MyOnlineShop.Ordering.Controllers
             await this.orderingDbContext
                 .SaveChangesAsync();
 
-            var totalOrdersCount = await this.orderingDbContext
-                .Orders
-                .CountAsync();
+            var msg = await this.orderingDbContext
+                .Messages
+                .FindAsync(message.Id);
 
-            await this.publisher.Publish(new OrderPlacedMessage
-            {
-                UserId = userId,
-                Total = totalOrdersCount
-            });
+            await this.publisher.Publish(messageData);
+
+            msg.MarkAsPublished();
+
+            await this.orderingDbContext
+                .SaveChangesAsync();
 
             return this.Ok();
         }

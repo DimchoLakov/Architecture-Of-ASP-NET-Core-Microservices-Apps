@@ -24,7 +24,7 @@ namespace MyOnlineShop.ShoppingCart
             services
                 .AddWebService<ShoppingCartDbContext>(this.Configuration)
                 .AddAutoMapper(Assembly.GetExecutingAssembly())
-                .AddMessaging(typeof(ProductUpdatedConsumer), typeof(ProductArchivedConsumer));
+                .AddMessaging(this.Configuration, typeof(ProductUpdatedConsumer), typeof(ProductArchivedConsumer));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
