@@ -4,6 +4,11 @@
     ViewData["Title"] = "My Orders";
 }
 
+@if (!string.IsNullOrWhiteSpace(ViewBag.OrderingInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.OrderingInoperativeMsg</p>
+}
+
 <div class="row">
     @if (!Model.Any())
     {

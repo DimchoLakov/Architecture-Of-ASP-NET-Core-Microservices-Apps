@@ -5,6 +5,11 @@
 }
 <h2 class="text-danger">Admin</h2>
 
+@if (!string.IsNullOrWhiteSpace(ViewBag.CatalogInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.CatalogInoperativeMsg</p>
+}
+
 <div class="row mb-2">
     <div class="col-md-4">
         <img src="@Model.ImageUrl" alt="Image" class="card-img">

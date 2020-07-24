@@ -5,6 +5,11 @@
 }
 <h2 class="text-danger">Admin</h2>
 
+@if (!string.IsNullOrWhiteSpace(ViewBag.CatalogInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.CatalogInoperativeMsg</p>
+}
+
 <div class="row mt-3 mb-3">
     <div class="col-md-7">
         <form method="get" asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-search="@Model.PaginationViewModel.Search">

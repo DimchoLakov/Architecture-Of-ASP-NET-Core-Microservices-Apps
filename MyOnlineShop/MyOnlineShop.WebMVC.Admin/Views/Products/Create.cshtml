@@ -5,6 +5,11 @@
 }
 <h2 class="text-danger">Admin</h2>
 
+@if (!string.IsNullOrWhiteSpace(ViewBag.CatalogInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.CatalogInoperativeMsg</p>
+}
+
 <form method="post" enctype="multipart/form-data" asp-area="Admin" asp-controller="Products" asp-action="Create">
     <div class="form-row">
         <div class="form-group col-md-5">

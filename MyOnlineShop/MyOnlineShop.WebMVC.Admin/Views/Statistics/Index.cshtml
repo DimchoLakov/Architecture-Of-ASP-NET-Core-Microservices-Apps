@@ -3,6 +3,12 @@
 @{
     ViewData["Title"] = "Statistics";
 }
+<h2 class="text-danger">Admin</h2>
+
+@if (!string.IsNullOrWhiteSpace(ViewBag.CatalogInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.StatisticsInoperativeMsg</p>
+}
 
 <div class="row text-center">
     <div class="col-md-4 offset-md-2">

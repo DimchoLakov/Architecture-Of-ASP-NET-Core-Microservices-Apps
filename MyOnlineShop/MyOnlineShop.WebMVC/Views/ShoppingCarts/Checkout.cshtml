@@ -4,6 +4,11 @@
     ViewData["Title"] = "Checkout";
 }
 
+@if (!string.IsNullOrWhiteSpace(ViewBag.ShoppingCartInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.ShoppingCartInoperativeMsg</p>
+}
+
 <div class="row">
     <div class="col-md-12">
         @foreach (var cartItem in Model.ShoppingCartViewModel.CartItemViewModels)

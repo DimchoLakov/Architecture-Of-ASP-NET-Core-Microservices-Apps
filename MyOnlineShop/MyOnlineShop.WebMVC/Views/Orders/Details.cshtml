@@ -4,6 +4,11 @@
     ViewData["Title"] = "Order Details";
 }
 
+@if (!string.IsNullOrWhiteSpace(ViewBag.OrderingInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.OrderingInoperativeMsg</p>
+}
+
 <div class="row">
     <div class="col-md-12">
         <p>Order Date: @Model.Date</p>

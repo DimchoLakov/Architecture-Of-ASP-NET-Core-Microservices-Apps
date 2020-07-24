@@ -5,6 +5,11 @@
 }
 <h2 class="text-danger">Admin</h2>
 
+@if (!string.IsNullOrWhiteSpace(ViewBag.CatalogInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.CatalogInoperativeMsg</p>
+}
+
 <form method="post" asp-area="Admin" asp-controller="Products" asp-action="Edit">
     <input asp-for="FromPageNumber" type="hidden" />
     <div class="row mb-2">

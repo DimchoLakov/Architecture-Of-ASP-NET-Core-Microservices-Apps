@@ -92,8 +92,7 @@ namespace MyOnlineShop.WebMVC.Admin
                         response.Redirect("/Identity/Login");
                     }
 
-                    if (response.StatusCode == (int)HttpStatusCode.BadRequest ||
-                        response.StatusCode == (int)HttpStatusCode.NotFound)
+                    if (response.StatusCode == (int)HttpStatusCode.NotFound)
                     {
                         response.Redirect("/Home/Error");
                     }

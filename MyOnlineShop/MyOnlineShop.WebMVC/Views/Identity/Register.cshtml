@@ -4,6 +4,11 @@
     ViewData["Title"] = "Register";
 }
 
+@if (!string.IsNullOrWhiteSpace(ViewBag.IdentityServiceInoperativeMsg))
+{
+    <p class="text-white bg-danger">@ViewBag.IdentityServiceInoperativeMsg</p>
+}
+
 <h1>@ViewData["Title"]</h1>
 
 <div class="row">
