@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.ViewModels.Categories;
 using MyOnlineShop.WebMVC.Admin.Services.Catalog;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -32,9 +33,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return View(categoryIndexViewModels);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return View(new List<CategoryIndexViewModel>());
@@ -49,9 +61,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.RedirectToAction(nameof(Index));
@@ -66,9 +89,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.RedirectToAction(nameof(Index));

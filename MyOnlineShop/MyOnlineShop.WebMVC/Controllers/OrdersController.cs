@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.Services;
 using MyOnlineShop.WebMVC.Services.Ordering;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC.Controllers
@@ -29,9 +32,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.View(orderIndexViewModels);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View();
@@ -45,9 +59,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.View(orderDetailsViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View();

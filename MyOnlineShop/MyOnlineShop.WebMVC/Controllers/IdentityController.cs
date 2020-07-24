@@ -84,12 +84,10 @@ namespace MyOnlineShop.WebMVC.Controllers
                 }
                 else
                 {
-                    this.ModelState.AddModelError(string.Empty, "Internal server error.");
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
                 }
-            }
-            catch (Exception ex)
-            {
-                this.HandleException(ex);
+
+                this.HandleException(apiEx);
             }
 
             return this.View(loginViewModel);
@@ -134,12 +132,10 @@ namespace MyOnlineShop.WebMVC.Controllers
                 }
                 else
                 {
-                    this.ModelState.AddModelError(string.Empty, "Internal server error.");
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
                 }
-            }
-            catch (Exception ex)
-            {
-                this.HandleException(ex);
+
+                this.HandleException(apiEx);
             }
 
             return this.View(registerViewModel);

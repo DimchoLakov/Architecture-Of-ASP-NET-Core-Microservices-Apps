@@ -9,7 +9,9 @@ using MyOnlineShop.Common.ViewModels.ShoppingCarts;
 using MyOnlineShop.WebMVC.Services.Catalog;
 using MyOnlineShop.WebMVC.Services.Ordering;
 using MyOnlineShop.WebMVC.Services.ShoppingCart;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC.Controllers
@@ -48,9 +50,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.View(shoppingCartViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View();
@@ -69,9 +82,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.Redirect($"/Products/Index/?currentPage={fromPage}");
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
 
                 return this.Redirect($"/Products/Index/?currentPage={fromPage}");
             }
@@ -86,9 +110,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.Redirect(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.Redirect(nameof(Index));
@@ -103,9 +138,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.Redirect(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.Redirect(nameof(Index));
@@ -119,9 +165,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.View(shoppingCartOrderWrapperViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View();
@@ -136,9 +193,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.RedirectToAction(nameof(Success));
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View();

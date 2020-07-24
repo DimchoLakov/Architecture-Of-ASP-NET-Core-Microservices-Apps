@@ -7,7 +7,6 @@ using MyOnlineShop.Common.Services;
 using MyOnlineShop.WebMVC.Admin.Services.Identity;
 using MyOnlineShop.WebMVC.Admin.ViewModels.Identity;
 using Newtonsoft.Json;
-using Refit;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -74,7 +73,7 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.LocalRedirect(loginViewModel.ReturnUrl);
             }
-            catch (ApiException apiEx)
+            catch (Refit.ApiException apiEx)
             {
                 if (apiEx.HasContent)
                 {
@@ -84,12 +83,10 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
                 }
                 else
                 {
-                    this.ModelState.AddModelError(string.Empty, "Internal server error.");
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
                 }
-            }
-            catch (Exception ex)
-            {
-                this.HandleException(ex);
+
+                this.HandleException(apiEx);
             }
 
             return this.View(loginViewModel);
@@ -124,7 +121,7 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.LocalRedirect(registerViewModel.ReturnUrl);
             }
-            catch (ApiException apiEx)
+            catch (Refit.ApiException apiEx)
             {
                 if (apiEx.HasContent)
                 {
@@ -134,12 +131,10 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
                 }
                 else
                 {
-                    this.ModelState.AddModelError(string.Empty, "Internal server error.");
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
                 }
-            }
-            catch (Exception ex)
-            {
-                this.HandleException(ex);
+
+                this.HandleException(apiEx);
             }
 
             return this.View(registerViewModel);

@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MyOnlineShop.Common.Constants;
 using MyOnlineShop.WebMVC.Admin.Services.Statistics;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC.Admin.Controllers
@@ -22,9 +25,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.View(statisticsViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return View();

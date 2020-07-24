@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyOnlineShop.WebMVC.Services.Catalog;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC.Controllers
@@ -24,9 +26,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.View(productPaginationViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, "Internal server error.");
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.BadRequest();
@@ -40,9 +53,20 @@ namespace MyOnlineShop.WebMVC.Controllers
 
                 return this.View(productDetailsViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, "Internal server error.");
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.BadRequest();

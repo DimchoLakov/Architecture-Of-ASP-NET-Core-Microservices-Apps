@@ -5,7 +5,9 @@ using MyOnlineShop.Common.Constants;
 using MyOnlineShop.Common.Services;
 using MyOnlineShop.Common.ViewModels.Products;
 using MyOnlineShop.WebMVC.Admin.Services.Catalog;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MyOnlineShop.WebMVC.Admin.Controllers
@@ -35,9 +37,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.View(productPaginationViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View(new ProductPaginationViewModel());
@@ -51,9 +64,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.View(productDetailsViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View(new ProductDetailsViewModel());
@@ -67,9 +91,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.View(createProductViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View(new CreateProductViewModel());
@@ -89,9 +124,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View(createProductViewModel);
@@ -105,9 +151,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.View(editProductViewModel);
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View(new EditProductViewModel());
@@ -127,9 +184,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.RedirectToAction(nameof(Index), new { currentPage = editProductViewModel.FromPageNumber });
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.View(editProductViewModel);
@@ -144,9 +212,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.RedirectToAction(nameof(Edit), new { id });
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.RedirectToAction(nameof(Edit), new { id });
@@ -161,9 +240,20 @@ namespace MyOnlineShop.WebMVC.Admin.Controllers
 
                 return this.RedirectToAction(nameof(Edit), new { id });
             }
-            catch (Exception ex)
+            catch (Refit.ApiException apiEx)
             {
-                this.HandleException(ex);
+                if (apiEx.HasContent)
+                {
+                    JsonConvert
+                        .DeserializeObject<List<string>>(apiEx.Content)
+                        .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                }
+                else
+                {
+                    this.ModelState.AddModelError(string.Empty, ErrorConstants.InternalServerErrorMessage);
+                }
+
+                this.HandleException(apiEx);
             }
 
             return this.RedirectToAction(nameof(Edit), new { id });
