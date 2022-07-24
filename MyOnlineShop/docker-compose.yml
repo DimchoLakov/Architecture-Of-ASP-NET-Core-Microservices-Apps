@@ -1,182 +1,212 @@
-version: "3.8"
+version: '3.8'
 
 services:
+  data:
+    container_name: sqlserver
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports: 
+        - "1433:1433"
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=myStrong12!@Password
+    volumes: 
+        - sqldata:/var/opt/mssql 
+    networks: 
+        - myonlineshop-network
 
-    data:
-        container_name: sqlserver
-        image: mcr.microsoft.com/mssql/server:2019-latest
-        ports: 
-            - "1433:1433"
-        environment:
-            - ACCEPT_EULA=Y
-            - SA_PASSWORD=myStrong12!@Password
-        volumes: 
-            - sqldata:/var/opt/mssql 
-        networks: 
-            - myonlineshop-network
-    
-    messages:
-        container_name: rabbitmq
-        image: rabbitmq:3-management
-        ports:
-            - "15672:15672"
-            - "5672:5672"
-        hostname: "rabbitmq"
-        environment:
-            - RABBITMQ_ERLANG_COOKIE=Rand0mR4bbitMqCo0k1e
-            - RABBITMQ_DEFAULT_USER=rabbitmq
-            - RABBITMQ_DEFAULT_PASS=rabbitmq
-        networks: 
-            - myonlineshop-network
+  messages:
+    container_name: rabbitmq
+    image: rabbitmq:3.10-management
+    ports:
+        - "15672:15672"
+        - "5672:5672"
+    hostname: "rabbitmq"
+    environment:
+        - RABBITMQ_ERLANG_COOKIE=Rand0mR4bbitMqCo0k1e
+        - RABBITMQ_DEFAULT_USER=rabbitmq
+        - RABBITMQ_DEFAULT_PASS=rabbitmq
+    volumes:
+        - rabbitmq:/var/lib/rabbitmq/mnesia
+    networks: 
+        - myonlineshop-network
 
-    identity:
-        container_name: identity
-        build:
-            context: ./
-            dockerfile: ./MyOnlineShop.Identity/Dockerfile
-        ports: 
-            - "5003:80"
-        env_file: ./MyOnlineShop.Common/Common.env
-        environment:
-            - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopIdentity;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
-        restart: on-failure
-        volumes:
-            - ./.aspnet/identity/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - myonlineshop-network
-        depends_on:
-            - data
-            
-    catalog:
-        container_name: catalog
-        build:
-            context: ./
-            dockerfile: ./MyOnlineShop.Catalog/Dockerfile
-        ports: 
-            - "5007:80"
-        env_file: ./MyOnlineShop.Common/Common.env
-        environment:
-            - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopCatalog;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
-        restart: on-failure
-        volumes:
-            - ./.aspnet/catalog/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - myonlineshop-network
-        depends_on:
-            - data
-            
-    statistics:
-        container_name: statistics
-        build:
-            context: ./
-            dockerfile: ./MyOnlineShop.Statistics/Dockerfile
-        ports: 
-            - "5015:80"
-        env_file: ./MyOnlineShop.Common/Common.env
-        environment:
-            - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopStatistics;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
-        restart: on-failure
-        volumes:
-            - ./.aspnet/statistics/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - myonlineshop-network
-        depends_on:
-            - data
+  myonlineshop.catalog:
+    image: ${DOCKER_REGISTRY-}myonlineshopcatalog
+    container_name: catalog
+    build:
+        context: .
+        dockerfile: MyOnlineShop.Catalog/Dockerfile
+    ports:
+        - "5007:80"
+    env_file: MyOnlineShop.Common/Common.env
+    environment:
+        - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopCatalog;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
+    restart: on-failure
+    volumes:
+        - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+        - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+        - data-protection:/root/.aspnet/DataProtection-Keys
+    networks: 
+        - myonlineshop-network
+    depends_on:
+        - data
 
-    ordering:
-        container_name: ordering
-        build:
-            context: ./
-            dockerfile: ./MyOnlineShop.Ordering/Dockerfile
-        ports: 
-            - "5005:80"
-        env_file: ./MyOnlineShop.Common/Common.env
-        environment:
-            - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopOrdering;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
-        restart: on-failure
-        volumes:
-            - ./.aspnet/ordering/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - myonlineshop-network
-        depends_on:
-            - data
+  myonlineshop.identity:
+    image: ${DOCKER_REGISTRY-}myonlineshopidentity
+    container_name: identity
+    build:
+        context: .
+        dockerfile: MyOnlineShop.Identity/Dockerfile
+    ports:
+        - "5003:80"
+    env_file: MyOnlineShop.Common/Common.env
+    environment:
+        - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopIdentity;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
+    restart: on-failure
+    volumes:
+        - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+        - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+        - data-protection:/root/.aspnet/DataProtection-Keys
+    networks: 
+        - myonlineshop-network
+    depends_on:
+        - data
 
-    shoppingcart:
-        container_name: shoppingcart
-        build:
-            context: ./
-            dockerfile: ./MyOnlineShop.ShoppingCart/Dockerfile
-        ports: 
-            - "5009:80"
-        env_file: ./MyOnlineShop.Common/Common.env
-        environment:
-            - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopShoppingCart;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
-        restart: on-failure
-        volumes:
-            - ./.aspnet/shoppingcart/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - myonlineshop-network
-        depends_on:
-            - data
+  myonlineshop.ordering:
+    image: ${DOCKER_REGISTRY-}myonlineshopordering
+    container_name: ordering
+    build:
+        context: .
+        dockerfile: MyOnlineShop.Ordering/Dockerfile
+    ports:
+        - "5005:80"
+    env_file: MyOnlineShop.Common/Common.env
+    environment:
+        - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopOrdering;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
+    restart: on-failure
+    volumes:
+        - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+        - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+        - data-protection:/root/.aspnet/DataProtection-Keys
+    networks: 
+        - myonlineshop-network
+    depends_on:
+        - data
 
-    shoppingcartgateway:
-        container_name: shoppingcartgateway
-        build:
-            context: ./
-            dockerfile: ./MyOnlineShop.ShoppingCart.Gateway/Dockerfile
-        ports: 
-            - "5011:80"
-        env_file: ./MyOnlineShop.Common/Common.env
-        restart: on-failure
-        volumes:
-            - ./.aspnet/shoppingcartgateway/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - myonlineshop-network
+  myonlineshop.shoppingcart:
+    image: ${DOCKER_REGISTRY-}myonlineshopshoppingcart
+    container_name: shoppingcart
+    build:
+        context: .
+        dockerfile: MyOnlineShop.ShoppingCart/Dockerfile
+    ports:
+        - "5009:80"
+    env_file: MyOnlineShop.Common/Common.env
+    environment:
+        - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopShoppingCart;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
+    restart: on-failure
+    volumes:
+        - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+        - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+        - data-protection:/root/.aspnet/DataProtection-Keys
+    networks: 
+        - myonlineshop-network
+    depends_on:
+        - data
 
-    webmvc:
-        container_name: webmvc
-        build:
-            context: ./
-            dockerfile: ./MyOnlineShop.WebMVC/Dockerfile
-        ports: 
-            - "5019:80"
-        env_file: ./MyOnlineShop.Common/Common.env
-        restart: on-failure
-        volumes:
-            - ./.aspnet/webmvc/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - myonlineshop-network
+  myonlineshop.shoppingcart.gateway:
+    image: ${DOCKER_REGISTRY-}myonlineshopshoppingcartgateway
+    container_name: shoppingcartgateway
+    build:
+        context: .
+        dockerfile: MyOnlineShop.ShoppingCart.Gateway/Dockerfile
+    ports:
+        - "5011:80"
+    env_file: MyOnlineShop.Common/Common.env
+    restart: on-failure
+    volumes:
+        - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+        - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+        - data-protection:/root/.aspnet/DataProtection-Keys
+    networks: 
+        - myonlineshop-network
 
-    webmvcadmin:
-        container_name: webmvcadmin
-        build:
-            context: ./
-            dockerfile: ./MyOnlineShop.WebMVC.Admin/Dockerfile
-        ports: 
-            - "5021:80"
-        env_file: ./MyOnlineShop.Common/Common.env
-        restart: on-failure
-        volumes:
-            - ./.aspnet/webmvcadmin/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - myonlineshop-network
+  myonlineshop.statistics:
+    image: ${DOCKER_REGISTRY-}myonlineshopstatistics
+    container_name: statistics
+    build:
+        context: .
+        dockerfile: MyOnlineShop.Statistics/Dockerfile
+    ports:
+        - "5015:80"
+    env_file: MyOnlineShop.Common/Common.env
+    environment:
+        - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyOnlineShopStatistics;User Id=sa;Password=myStrong12!@Password;MultipleActiveResultSets=true;Integrated Security=false;
+    restart: on-failure
+    volumes:
+        - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+        - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+        - data-protection:/root/.aspnet/DataProtection-Keys
+    networks: 
+        - myonlineshop-network
+    depends_on:
+        - data
 
-    watchdog:
-        container_name: watchdog
-        build:
-            context: ./
-            dockerfile: ./MyOnlineShop.Watchdog/Dockerfile
-        ports: 
-            - "5025:80"
-        env_file: ./MyOnlineShop.Common/Common.env
-        restart: on-failure
-        volumes:
-            - ./.aspnet/watchdog/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - myonlineshop-network
+  myonlineshop.webmvc:
+    image: ${DOCKER_REGISTRY-}myonlineshopwebmvc
+    container_name: webmvc
+    build:
+        context: .
+        dockerfile: MyOnlineShop.WebMVC/Dockerfile
+    ports:
+        - "5019:80"
+    env_file: MyOnlineShop.Common/Common.env
+    restart: on-failure
+    volumes:
+        - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+        - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+        - data-protection:/root/.aspnet/DataProtection-Keys
+    networks: 
+        - myonlineshop-network
+
+  myonlineshop.webmvc.admin:
+    image: ${DOCKER_REGISTRY-}myonlineshopwebmvcadmin
+    container_name: webmvcadmin
+    build:
+        context: .
+        dockerfile: MyOnlineShop.WebMVC.Admin/Dockerfile
+    ports:
+        - "5021:80"
+    env_file: MyOnlineShop.Common/Common.env
+    restart: on-failure
+    volumes:
+        - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+        - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+        - data-protection:/root/.aspnet/DataProtection-Keys
+    networks: 
+        - myonlineshop-network
+
+  myonlineshop.watchdog:
+    image: ${DOCKER_REGISTRY-}myonlineshopwatchdog
+    container_name: watchdog
+    build:
+        context: .
+        dockerfile: MyOnlineShop.Watchdog/Dockerfile
+    ports:
+        - "5025:80"
+    env_file: MyOnlineShop.Common/Common.env
+    restart: on-failure
+    volumes:
+        - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+        - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+        - data-protection:/root/.aspnet/DataProtection-Keys
+    networks: 
+        - myonlineshop-network
 
 networks:
-    myonlineshop-network:
+  myonlineshop-network:
 
 volumes:
-    sqldata:
+  sqldata:
+  rabbitmq:
+  data-protection:

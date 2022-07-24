@@ -1,20 +1,22 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using MyOnlineShop.Common.Infrastructure;
+using MyOnlineShop.Ordering.Data;
+using MyOnlineShop.ShoppingCart.Messages;
+using System.Reflection;
 
-namespace MyOnlineShop.ShoppingCart
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+var builder = WebApplication.CreateBuilder(args);
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+builder
+    .Services
+    .AddWebService<ShoppingCartDbContext>(builder.Configuration)
+    .AddAutoMapper(Assembly.GetExecutingAssembly())
+    .AddMessaging(builder.Configuration, typeof(ProductUpdatedConsumer), typeof(ProductArchivedConsumer));
+
+var app = builder.Build();
+
+app
+    .UseWebService(app.Environment)
+    .Initialize();
+
+app.Run();

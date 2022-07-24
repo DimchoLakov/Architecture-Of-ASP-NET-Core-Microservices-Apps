@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Hangfire;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MyOnlineShop.Common.Services;
-using System;
-using Hangfire;
+using Microsoft.Extensions.Hosting;
 using MyOnlineShop.Common.Messages;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using HealthChecks.UI.Client;
+using MyOnlineShop.Common.Services;
 
 namespace MyOnlineShop.Common.Infrastructure
 {
@@ -42,7 +41,6 @@ namespace MyOnlineShop.Common.Infrastructure
 
             if (app.ApplicationServices.GetService<MessagesHostedService>() != null)
             {
-                app.UseHangfireServer();
                 app.UseHangfireDashboard();
             }
 

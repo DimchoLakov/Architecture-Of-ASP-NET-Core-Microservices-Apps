@@ -1,5 +1,4 @@
-﻿using GreenPipes;
-using Hangfire;
+﻿using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -110,8 +109,6 @@ namespace MyOnlineShop.Common.Infrastructure
                             host.Password("rabbitmq");
                         });
 
-                        rmq.UseHealthCheck(bus);
-
                         consumers.ForEach(consumer => rmq.ReceiveEndpoint(consumer.FullName, endpoint =>
                         {
                             endpoint.PrefetchCount = 6;
@@ -120,8 +117,7 @@ namespace MyOnlineShop.Common.Infrastructure
                             endpoint.ConfigureConsumer(bus, consumer);
                         }));
                     }));
-                })
-                .AddMassTransitHostedService();
+                });
 
             services
                 .AddHangfire(config => config

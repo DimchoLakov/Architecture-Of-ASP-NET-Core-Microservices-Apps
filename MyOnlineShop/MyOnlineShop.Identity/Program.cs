@@ -1,26 +1,26 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using MyOnlineShop.Common.Infrastructure;
+using MyOnlineShop.Common.Services;
+using MyOnlineShop.Identity.Data;
+using MyOnlineShop.Identity.DataSeed;
+using MyOnlineShop.Identity.Infrastructure;
+using MyOnlineShop.Identity.Services.Identity;
 
-namespace MyOnlineShop.Identity
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+var builder = WebApplication.CreateBuilder(args);
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+builder
+    .Services
+    .AddWebService<MyIdentityDbContext>(builder.Configuration)
+    .AddUserStorage()
+    .AddTransient<IDataSeeder, IdentityDataSeeder>()
+    .AddTransient<IIdentityService, IdentityService>()
+    .AddTransient<ITokenGeneratorService, TokenGeneratorService>();
+
+var app = builder.Build();
+
+app
+    .UseWebService(app.Environment)
+    .Initialize();
+
+app.Run();

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30128.74
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyOnlineShop.WebMVC", "MyOnlineShop.WebMVC\MyOnlineShop.WebMVC.csproj", "{FA41F2F9-D14C-40AD-91CE-7939304E2E91}"
 EndProject
@@ -21,9 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyOnlineShop.ShoppingCart.G
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyOnlineShop.Statistics", "MyOnlineShop.Statistics\MyOnlineShop.Statistics.csproj", "{719FB29D-9281-461F-89A9-B05FB76059A6}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{1EAA21B9-7301-4637-A567-6A1055471F87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyOnlineShop.Watchdog", "MyOnlineShop.Watchdog\MyOnlineShop.Watchdog.csproj", "{A983CE2E-BBB8-42DF-ABA2-B167A46573FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyOnlineShop.Watchdog", "MyOnlineShop.Watchdog\MyOnlineShop.Watchdog.csproj", "{A983CE2E-BBB8-42DF-ABA2-B167A46573FC}"
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{89866A8B-A628-4730-BF50-5EFD75F23177}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,14 +67,14 @@ Global
 		{719FB29D-9281-461F-89A9-B05FB76059A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{719FB29D-9281-461F-89A9-B05FB76059A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{719FB29D-9281-461F-89A9-B05FB76059A6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1EAA21B9-7301-4637-A567-6A1055471F87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EAA21B9-7301-4637-A567-6A1055471F87}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1EAA21B9-7301-4637-A567-6A1055471F87}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EAA21B9-7301-4637-A567-6A1055471F87}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A983CE2E-BBB8-42DF-ABA2-B167A46573FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A983CE2E-BBB8-42DF-ABA2-B167A46573FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A983CE2E-BBB8-42DF-ABA2-B167A46573FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A983CE2E-BBB8-42DF-ABA2-B167A46573FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89866A8B-A628-4730-BF50-5EFD75F23177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89866A8B-A628-4730-BF50-5EFD75F23177}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89866A8B-A628-4730-BF50-5EFD75F23177}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89866A8B-A628-4730-BF50-5EFD75F23177}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
