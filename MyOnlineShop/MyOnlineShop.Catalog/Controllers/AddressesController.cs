@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineShop.Catalog.Constants;
 using MyOnlineShop.Catalog.Data.Models.Customers;
-using MyOnlineShop.Catalog.Filters;
 using MyOnlineShop.Common.Controllers;
 using MyOnlineShop.Common.ViewModels.Addresses;
 using MyOnlineShop.Common.ViewModels.ShoppingCarts;
@@ -29,7 +28,6 @@ namespace MyOnlineShop.Catalog.Controllers
         }
 
         [HttpGet("{userId}")]
-        [ServiceFilter(typeof(AddCustomerActionFilter))]
         public async Task<ActionResult<AddressViewModel>> GetAddress(string userId)
         {
             var addressViewModel = await this.catalogDbContext

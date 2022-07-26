@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace MyOnlineShop.Common.Data
 {
-    public abstract class MessageDbContext : DbContext
+    public abstract class MessageDbContext : DbContext, IMessageDbContext
     {
         public MessageDbContext(DbContextOptions options)
             : base(options)

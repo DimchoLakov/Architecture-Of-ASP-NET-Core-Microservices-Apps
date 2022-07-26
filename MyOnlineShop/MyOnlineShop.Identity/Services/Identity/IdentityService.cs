@@ -1,6 +1,10 @@
 ﻿namespace MyOnlineShop.Identity.Services.Identity
 {
+    using MassTransit;
     using Microsoft.AspNetCore.Identity;
+    using MyOnlineShop.Common.Data.Models;
+    using MyOnlineShop.Common.Messages.Identity;
+    using MyOnlineShop.Identity.Data;
     using MyOnlineShop.Identity.Data.Models;
     using MyOnlineShop.Identity.Models;
     using System.Linq;
@@ -12,13 +16,19 @@
 
         private readonly UserManager<User> userManager;
         private readonly ITokenGeneratorService jwtTokenGenerator;
+        private readonly MyIdentityDbContext myIdentityDbContext;
+        private readonly IBus bus;
 
         public IdentityService(
             UserManager<User> userManager,
-            ITokenGeneratorService jwtTokenGenerator)
+            ITokenGeneratorService jwtTokenGenerator,
+            MyIdentityDbContext myIdentityDbContext,
+            IBus bus)
         {
             this.userManager = userManager;
             this.jwtTokenGenerator = jwtTokenGenerator;
+            this.myIdentityDbContext = myIdentityDbContext;
+            this.bus = bus;
         }
 
         public async Task<RegisterCustomerResultModel> RegisterAsync(RegisterCustomerInputModel registerCustomerInputModel)
@@ -35,6 +45,34 @@
 
             if (identityResult.Succeeded)
             {
+                var messageData = new UserCreatedMessage
+                {
+                    UserId = user.Id,
+                    Email = registerCustomerInputModel.Email,
+                    FirstName = registerCustomerInputModel.FirstName,
+                    LastName = registerCustomerInputModel.LastName
+                };
+
+                var message = new Message(messageData);
+
+                await this.myIdentityDbContext
+                    .Messages
+                    .AddAsync(message);
+
+                await this.myIdentityDbContext
+                    .SaveChangesAsync();
+
+                await this.bus.Publish(messageData);
+
+                var msg = await this.myIdentityDbContext
+                    .Messages
+                    .FindAsync(message.Id);
+
+                msg.MarkAsPublished();
+
+                await this.myIdentityDbContext
+                    .SaveChangesAsync();
+
                 registerCustomerResultOutputModel.Succeeded = true;
                 registerCustomerResultOutputModel.Email = registerCustomerInputModel.Email;
                 registerCustomerResultOutputModel.Password = registerCustomerInputModel.Password;

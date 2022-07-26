@@ -15,7 +15,8 @@ builder
     .AddUserStorage()
     .AddTransient<IDataSeeder, IdentityDataSeeder>()
     .AddTransient<IIdentityService, IdentityService>()
-    .AddTransient<ITokenGeneratorService, TokenGeneratorService>();
+    .AddTransient<ITokenGeneratorService, TokenGeneratorService>()
+    .AddMessaging(builder.Configuration);
 
 var app = builder.Build();
 

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using MyOnlineShop.Catalog.DataSeed;
-using MyOnlineShop.Catalog.Filters;
+using MyOnlineShop.Catalog.Messages;
 using MyOnlineShop.Common.Infrastructure;
 using MyOnlineShop.Common.Services;
 using MyOnlineShop.Ordering.Data;
@@ -13,9 +13,8 @@ builder
     .Services
     .AddWebService<CatalogDbContext>(builder.Configuration)
     .AddTransient<IDataSeeder, CatalogDataSeeder>()
-    .AddScoped<AddCustomerActionFilter>()
     .AddAutoMapper(Assembly.GetExecutingAssembly())
-    .AddMessaging(builder.Configuration);
+    .AddMessaging(builder.Configuration, typeof(UserCreatedMessageConsumer));
 
 var app = builder.Build();
 
