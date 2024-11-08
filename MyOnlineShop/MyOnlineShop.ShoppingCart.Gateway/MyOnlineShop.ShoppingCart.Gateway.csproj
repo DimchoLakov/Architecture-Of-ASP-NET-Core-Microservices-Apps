@@ -11,7 +11,7 @@
 		<PackageReference Include="AutoMapper" Version="11.0.1" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.16.1" />
-		<PackageReference Include="refit" Version="6.3.2" />
+		<PackageReference Include="refit" Version="7.2.22" />
 		<PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />
 	</ItemGroup>
 
